@@ -8,6 +8,7 @@ import { calculateAllSalaries, formatCurrency } from '../utils/salary-calc.js';
 import { formatHoursShort, formatDate, formatTime, getDayName } from '../utils/time.js';
 import { renderNavbar, setupNavbar } from '../components/navbar.js';
 import { toast } from '../components/toast.js';
+import { exportToCSV } from '../utils/export.js';
 
 export default async function salaryPage(container) {
   // Auth check
@@ -114,9 +115,14 @@ export default async function salaryPage(container) {
       <div class="card mb-3">
         <div class="flex-between mb-2" style="flex-wrap: wrap; gap: 0.5rem;">
           <h2 style="margin: 0;">Bảng lương Tháng ${month}/${year}</h2>
-          <button class="btn btn-outline" id="btn-print">
-            🖨️ In báo cáo
-          </button>
+          <div class="flex gap-1">
+            <button class="btn btn-outline" id="btn-print">
+              🖨️ In báo cáo
+            </button>
+            <button class="btn btn-outline" id="btn-export-excel" style="color: var(--success); border-color: rgba(16, 185, 129, 0.2)">
+              🟢 Xuất Excel
+            </button>
+          </div>
         </div>
 
         <div class="table-container">
@@ -221,6 +227,11 @@ export default async function salaryPage(container) {
     // Print handler
     document.getElementById('btn-print').addEventListener('click', () => {
       handlePrint(month, year, data, totalSalary);
+    });
+
+    // Export Excel handler
+    document.getElementById('btn-export-excel').addEventListener('click', () => {
+      handleExportExcel(month, year, data);
     });
   }
 
@@ -443,6 +454,68 @@ export default async function salaryPage(container) {
         </td>
       </tr>
     `;
+  }
+
+  function handleExportExcel(month, year, data) {
+    if (!data || data.length === 0) {
+      toast.warning('Không có dữ liệu để xuất Excel!');
+      return;
+    }
+
+    const headers = [
+      'STT',
+      'Nhân viên',
+      'Loại lương',
+      'Số ngày làm',
+      'Tổng giờ làm',
+      'Mức lương / Đơn giá',
+      'Thành tiền (Thực nhận)'
+    ];
+
+    const rows = data.map((item, index) => {
+      const stt = index + 1;
+      const empName = item.employee.name;
+      const typeName = item.typeName;
+      const days = item.type === 'monthly' ? item.actualDays : item.totalDays;
+      const hours = item.totalHours;
+      
+      const rateVal = item.type === 'hourly' ? item.rate : item.monthlyRate;
+      const rateUnit = item.type === 'hourly' ? 'đ/giờ' : 'đ/tháng';
+      const rateStr = `${Math.round(rateVal)} ${rateUnit}`;
+      const salaryVal = Math.round(item.salary);
+
+      return [
+        stt,
+        empName,
+        typeName,
+        days,
+        hours.toFixed(2),
+        rateStr,
+        salaryVal
+      ];
+    });
+
+    // Thêm dòng tổng cộng
+    const totalSalary = data.reduce((sum, d) => sum + (d.salary || 0), 0);
+    rows.push([
+      'Tổng cộng',
+      '',
+      '',
+      '',
+      '',
+      '',
+      Math.round(totalSalary)
+    ]);
+
+    const filename = `bang_luong_thang_${month}_${year}.csv`;
+
+    try {
+      exportToCSV(filename, headers, rows);
+      toast.success('Xuất file Excel bảng lương thành công! 🟢');
+    } catch (err) {
+      console.error('Lỗi xuất Excel bảng lương:', err);
+      toast.error('Không thể xuất file: ' + err.message);
+    }
   }
 
   // Auto-calculate on load

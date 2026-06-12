@@ -26,6 +26,7 @@ import {
 import { toast } from '../components/toast.js';
 import { showModal, closeModal, showConfirm } from '../components/modal.js';
 import { renderNavbar, setupNavbar } from '../components/navbar.js';
+import { exportToCSV } from '../utils/export.js';
 
 export default async function attendancePage(container) {
   // ── Auth guard ──
@@ -77,6 +78,7 @@ export default async function attendancePage(container) {
               <button class="btn btn-primary" id="btn-filter">🔍 Lọc</button>
               <button class="btn btn-success" id="btn-add-manual">➕ Thêm thủ công</button>
               <button class="btn btn-outline" id="btn-batch-deduct" style="color: var(--warning); border-color: rgba(202, 138, 4, 0.2)">⏱️ Trừ hàng loạt</button>
+              <button class="btn btn-outline" id="btn-export-excel" style="color: var(--success); border-color: rgba(16, 185, 129, 0.2)">🟢 Xuất Excel</button>
             </div>
           </div>
         </div>
@@ -114,6 +116,7 @@ export default async function attendancePage(container) {
   const btnFilter = document.getElementById('btn-filter');
   const btnAddManual = document.getElementById('btn-add-manual');
   const btnBatchDeduct = document.getElementById('btn-batch-deduct');
+  const btnExportExcel = document.getElementById('btn-export-excel');
   const tableWrapper = document.getElementById('attendance-table-wrapper');
   const summaryEl = document.getElementById('attendance-summary');
 
@@ -466,6 +469,10 @@ export default async function attendancePage(container) {
     console.log('Batch deduct button clicked!');
     openBatchDeductModal();
   });
+  btnExportExcel.addEventListener('click', () => {
+    console.log('Export excel button clicked!');
+    handleExportExcel();
+  });
 
   // Preset range listeners
   presetToday.addEventListener('click', () => {
@@ -573,6 +580,66 @@ export default async function attendancePage(container) {
         }
       ]
     });
+  }
+
+  // ── Export to Excel handler ──
+  function handleExportExcel() {
+    if (!records || records.length === 0) {
+      toast.warning('Không có dữ liệu để xuất Excel!');
+      return;
+    }
+
+    const headers = [
+      'Nhân viên',
+      'Ngày',
+      'Giờ vào',
+      'Giờ ra',
+      'Số giờ làm',
+      'Khấu trừ (phút)',
+      'Ghi chú',
+      'Trạng thái'
+    ];
+
+    const rows = records.map((r) => {
+      const empName = r.employees?.name || 'Không rõ';
+      const dateStr = formatDate(r.check_in);
+      const checkinStr = formatTime(r.check_in);
+      const checkoutStr = r.check_out ? formatTime(r.check_out) : 'Đang làm';
+      
+      const hours = r.check_out ? (r.total_hours != null ? r.total_hours : calculateHours(r.check_in, r.check_out)) : 0;
+      const hoursStr = hours > 0 ? hours.toFixed(2) : '0';
+      
+      const deducted = r.deducted_minutes || 0;
+      const note = r.note || '';
+      const statusStr = !r.check_out
+        ? 'Đang làm'
+        : r.is_edited
+          ? 'Đã sửa'
+          : 'Hoàn thành';
+
+      return [
+        empName,
+        dateStr,
+        checkinStr,
+        checkoutStr,
+        hoursStr,
+        deducted,
+        note,
+        statusStr
+      ];
+    });
+
+    const startVal = filterStart.value || 'tungay';
+    const endVal = filterEnd.value || 'denngay';
+    const filename = `lich_su_cham_cong_${startVal}_den_${endVal}.csv`;
+
+    try {
+      exportToCSV(filename, headers, rows);
+      toast.success('Xuất file Excel thành công! 🟢');
+    } catch (err) {
+      console.error('Lỗi xuất Excel:', err);
+      toast.error('Không thể xuất file: ' + err.message);
+    }
   }
 
   // ── Initial load ──
