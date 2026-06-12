@@ -23,38 +23,40 @@ export default async function salaryPage(container) {
 
   container.innerHTML = renderNavbar() + `
     <main class="main-content">
-      <div class="page-header">
-        <h1>💰 Tính Lương</h1>
-      </div>
+      <div class="container">
+        <div class="page-header">
+          <h1>💰 Tính Lương</h1>
+        </div>
 
-      <div class="card mb-3">
-        <div class="salary-filter">
-          <div class="flex gap-2">
-            <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label">Tháng</label>
-              <select id="salary-month" class="form-select">
-                ${Array.from({ length: 12 }, (_, i) =>
-                  `<option value="${i + 1}" ${i + 1 === currentMonth ? 'selected' : ''}>Tháng ${i + 1}</option>`
-                ).join('')}
-              </select>
+        <div class="card mb-3">
+          <div class="salary-filter">
+            <div class="flex gap-2">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Tháng</label>
+                <select id="salary-month" class="form-select">
+                  ${Array.from({ length: 12 }, (_, i) =>
+                    `<option value="${i + 1}" ${i + 1 === currentMonth ? 'selected' : ''}>Tháng ${i + 1}</option>`
+                  ).join('')}
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Năm</label>
+                <select id="salary-year" class="form-select">
+                  ${Array.from({ length: 5 }, (_, i) => {
+                    const y = currentYear - 2 + i;
+                    return `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`;
+                  }).join('')}
+                </select>
+              </div>
+              <button class="btn btn-primary" id="btn-calculate">
+                📊 Tính lương
+              </button>
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label">Năm</label>
-              <select id="salary-year" class="form-select">
-                ${Array.from({ length: 5 }, (_, i) => {
-                  const y = currentYear - 2 + i;
-                  return `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`;
-                }).join('')}
-              </select>
-            </div>
-            <button class="btn btn-primary" id="btn-calculate">
-              📊 Tính lương
-            </button>
           </div>
         </div>
-      </div>
 
-      <div id="salary-result"></div>
+        <div id="salary-result"></div>
+      </div>
     </main>
   `;
 

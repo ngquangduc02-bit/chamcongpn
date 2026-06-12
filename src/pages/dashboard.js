@@ -430,7 +430,7 @@ export default async function dashboard(container) {
     .main-content {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 24px 20px 48px;
+      padding: calc(var(--navbar-height) + 24px) 20px 48px;
     }
 
     /* ── Empty state ── */

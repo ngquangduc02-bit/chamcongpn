@@ -43,64 +43,66 @@ export default async function attendancePage(container) {
   // ── Initial render ──
   container.innerHTML = renderNavbar() + `
     <main class="main-content">
-      <div class="page-header">
-        <h1>📋 Quản lý chấm công</h1>
-        <p>Xem và chỉnh sửa bản ghi chấm công của nhân viên</p>
-      </div>
-
-      <!-- Filter Bar -->
-      <div class="card mb-3">
-        <div class="preset-filters flex gap-2 mb-3" style="flex-wrap: wrap; border-bottom: 1px solid var(--border-default); padding-bottom: 12px;">
-          <span style="font-size: 0.9rem; color: var(--text-tertiary); display: flex; align-items: center; margin-right: 8px;">⏱️ Chọn nhanh:</span>
-          <button class="btn btn-outline btn-sm" id="preset-today" style="padding: 4px 12px; font-size: 0.85rem;">Hôm nay</button>
-          <button class="btn btn-outline btn-sm" id="preset-yesterday" style="padding: 4px 12px; font-size: 0.85rem;">Hôm qua</button>
-          <button class="btn btn-outline btn-sm" id="preset-week" style="padding: 4px 12px; font-size: 0.85rem;">Tuần này</button>
-          <button class="btn btn-outline btn-sm" id="preset-month" style="padding: 4px 12px; font-size: 0.85rem;">Tháng này</button>
+      <div class="container">
+        <div class="page-header">
+          <h1>📋 Quản lý chấm công</h1>
+          <p>Xem và chỉnh sửa bản ghi chấm công của nhân viên</p>
         </div>
-        <div class="filter-bar">
-          <div class="form-group">
-            <label class="form-label">Từ ngày</label>
-            <input type="date" id="filter-start" class="form-input" value="${toInputDate(start)}">
+
+        <!-- Filter Bar -->
+        <div class="card mb-3">
+          <div class="preset-filters flex gap-2 mb-3" style="flex-wrap: wrap; border-bottom: 1px solid var(--border-default); padding-bottom: 12px;">
+            <span style="font-size: 0.9rem; color: var(--text-tertiary); display: flex; align-items: center; margin-right: 8px;">⏱️ Chọn nhanh:</span>
+            <button class="btn btn-outline btn-sm" id="preset-today" style="padding: 4px 12px; font-size: 0.85rem;">Hôm nay</button>
+            <button class="btn btn-outline btn-sm" id="preset-yesterday" style="padding: 4px 12px; font-size: 0.85rem;">Hôm qua</button>
+            <button class="btn btn-outline btn-sm" id="preset-week" style="padding: 4px 12px; font-size: 0.85rem;">Tuần này</button>
+            <button class="btn btn-outline btn-sm" id="preset-month" style="padding: 4px 12px; font-size: 0.85rem;">Tháng này</button>
           </div>
-          <div class="form-group">
-            <label class="form-label">Đến ngày</label>
-            <input type="date" id="filter-end" class="form-input" value="${toInputDate(end)}">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Nhân viên</label>
-            <select id="filter-employee" class="form-select">
-              <option value="">Tất cả nhân viên</option>
-            </select>
-          </div>
-          <div class="form-group filter-actions">
-            <label class="form-label">&nbsp;</label>
-            <div class="flex gap-1">
-              <button class="btn btn-primary" id="btn-filter">🔍 Lọc</button>
-              <button class="btn btn-success" id="btn-add-manual">➕ Thêm thủ công</button>
-              <button class="btn btn-outline" id="btn-batch-deduct" style="color: var(--warning); border-color: rgba(202, 138, 4, 0.2)">⏱️ Trừ hàng loạt</button>
-              <button class="btn btn-outline" id="btn-export-excel" style="color: var(--success); border-color: rgba(16, 185, 129, 0.2)">🟢 Xuất Excel</button>
+          <div class="filter-bar">
+            <div class="form-group">
+              <label class="form-label">Từ ngày</label>
+              <input type="date" id="filter-start" class="form-input" value="${toInputDate(start)}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Đến ngày</label>
+              <input type="date" id="filter-end" class="form-input" value="${toInputDate(end)}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nhân viên</label>
+              <select id="filter-employee" class="form-select">
+                <option value="">Tất cả nhân viên</option>
+              </select>
+            </div>
+            <div class="form-group filter-actions">
+              <label class="form-label">&nbsp;</label>
+              <div class="flex gap-1">
+                <button class="btn btn-primary" id="btn-filter">🔍 Lọc</button>
+                <button class="btn btn-success" id="btn-add-manual">➕ Thêm thủ công</button>
+                <button class="btn btn-outline" id="btn-batch-deduct" style="color: var(--warning); border-color: rgba(202, 138, 4, 0.2)">⏱️ Trừ hàng loạt</button>
+                <button class="btn btn-outline" id="btn-export-excel" style="color: var(--success); border-color: rgba(16, 185, 129, 0.2)">🟢 Xuất Excel</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Table -->
-      <div class="card">
-        <div class="table-container" id="attendance-table-wrapper">
-          <p class="text-center mt-2">Đang tải dữ liệu...</p>
-        </div>
-      </div>
-
-      <!-- Summary -->
-      <div class="card mt-3" id="attendance-summary" style="display:none;">
-        <div class="flex flex-between gap-2" style="flex-wrap:wrap;">
-          <div class="stat-card">
-            <div class="stat-value" id="summary-total-records">0</div>
-            <div class="stat-label">Tổng bản ghi</div>
+        <!-- Table -->
+        <div class="card">
+          <div class="table-container" id="attendance-table-wrapper">
+            <p class="text-center mt-2">Đang tải dữ liệu...</p>
           </div>
-          <div class="stat-card">
-            <div class="stat-value" id="summary-total-hours">0</div>
-            <div class="stat-label">Tổng giờ làm</div>
+        </div>
+
+        <!-- Summary -->
+        <div class="card mt-3" id="attendance-summary" style="display:none;">
+          <div class="flex flex-between gap-2" style="flex-wrap:wrap;">
+            <div class="stat-card">
+              <div class="stat-value" id="summary-total-records">0</div>
+              <div class="stat-label">Tổng bản ghi</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="summary-total-hours">0</div>
+              <div class="stat-label">Tổng giờ làm</div>
+            </div>
           </div>
         </div>
       </div>
