@@ -1277,7 +1277,7 @@ small {
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
   border-radius: var(--border-radius-xl);
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: var(--shadow-md);
 }
 
@@ -3255,5 +3255,96 @@ tbody td {
 
 
 /* ============================================================
+   35. RESPONSIVE FOR FILTERS & TABLES (CSS Đáp ứng cho bộ lọc & Bảng)
+   ============================================================ */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: flex-end;
+}
+
+.filter-bar .form-group {
+  flex: 1 1 200px;
+  margin-bottom: 0;
+}
+
+.filter-bar .filter-actions {
+  flex: 2 1 auto;
+}
+
+.salary-filter .flex {
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.salary-filter .form-group {
+  flex: 1 1 150px;
+}
+
+.salary-filter .btn {
+  flex: 1 1 auto;
+  height: 42px;
+}
+
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .filter-bar .form-group {
+    width: 100%;
+  }
+
+  .filter-bar .filter-actions .form-label {
+    display: none;
+  }
+
+  .filter-bar .filter-actions .flex {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .filter-bar .filter-actions .btn {
+    flex: 1 1 calc(50% - var(--space-2));
+    justify-content: center;
+    font-size: var(--font-size-xs);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .salary-filter .flex {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .salary-filter .form-group {
+    width: 100%;
+    margin-bottom: 0 !important;
+  }
+
+  .salary-filter .btn {
+    width: 100%;
+    margin-top: var(--space-2);
+  }
+
+  /* Tạo chiều rộng tối thiểu cho các bảng dữ liệu khi kéo ngang trên di động */
+  .table-container table {
+    min-width: 750px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-bar .filter-actions .btn {
+    flex: 1 1 100%;
+  }
+}
+
+
+/* ============================================================
    FIN – Hết file CSS
    ============================================================ */
+

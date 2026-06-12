@@ -29,7 +29,7 @@ export default async function salaryPage(container) {
 
       <div class="card mb-3">
         <div class="salary-filter">
-          <div class="flex gap-2" style="align-items: flex-end; flex-wrap: wrap;">
+          <div class="flex gap-2">
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Tháng</label>
               <select id="salary-month" class="form-select">
