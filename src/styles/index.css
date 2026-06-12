@@ -129,7 +129,7 @@
 
   /* ── Layout ── */
   --navbar-height: 64px;
-  --sidebar-width: 260px;
+  --sidebar-width: 0px;
   --sidebar-collapsed-width: 72px;
   --container-max-width: 1280px;
 
@@ -3340,6 +3340,105 @@ tbody td {
 @media (max-width: 480px) {
   .filter-bar .filter-actions .btn {
     flex: 1 1 100%;
+  }
+}
+
+
+/* ============================================================
+   36. TOP NAVBAR MENU & MOBILE DRAWER (Style cho Menu điều hướng Admin)
+   ============================================================ */
+.navbar-menu {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.navbar-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--border-radius-md);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-base);
+}
+
+.navbar-link:hover {
+  color: var(--text-primary);
+  background: var(--glass-bg-hover);
+}
+
+.navbar-link.active {
+  color: var(--text-primary);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft-border);
+  font-weight: var(--font-weight-semibold);
+}
+
+.navbar-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: var(--z-overlay);
+  padding: 0;
+}
+
+.navbar-toggle span {
+  width: 100%;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: var(--border-radius-full);
+  transition: all var(--transition-base);
+}
+
+@media (max-width: 1024px) {
+  .navbar-toggle {
+    display: flex;
+  }
+
+  .navbar-menu {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 30, 0.95);
+    backdrop-filter: blur(var(--glass-blur-heavy));
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy));
+    border-bottom: 1px solid var(--glass-border);
+    flex-direction: column;
+    padding: var(--space-4) 0;
+    gap: var(--space-2);
+    transform: translateY(-150%);
+    transition: transform var(--transition-base);
+    z-index: var(--z-dropdown);
+  }
+
+  .navbar-menu.navbar-menu-open {
+    transform: translateY(0);
+  }
+
+  .navbar-link {
+    width: 90%;
+    justify-content: flex-start;
+    padding: var(--space-3) var(--space-5);
+  }
+  
+  /* Hiệu ứng hoạt họa cho nút hamburger khi active */
+  .navbar-toggle.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .navbar-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .navbar-toggle.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
   }
 }
 
