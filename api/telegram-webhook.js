@@ -128,6 +128,7 @@ export default async function handler(req, res) {
       }
 
       let totalHours = 0;
+      const dailyDays = new Set();
       let logText = '';
 
       if (records && records.length > 0) {
@@ -140,6 +141,10 @@ export default async function handler(req, res) {
             const d = new Date(r.check_in);
             const dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
             
+            // Theo dõi các ngày đi làm độc nhất (theo múi giờ Việt Nam)
+            const dayKey = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
+            dailyDays.add(dayKey);
+
             // Format check-in/out times in UTC+7
             const checkinTime = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' });
             const checkoutTime = new Date(r.check_out).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' });
@@ -150,7 +155,24 @@ export default async function handler(req, res) {
         });
       }
 
-      const msg = `📅 <b>Lịch sử chấm công: ${emp.name}</b>\nTháng ${now.getMonth() + 1}/${now.getFullYear()}\n\n⏱️ Tổng giờ làm: <b>${totalHours.toFixed(1)} giờ</b>\n\nChi tiết:\n${logText || 'Chưa có ca làm nào được hoàn thành.'}`;
+      const totalDays = dailyDays.size;
+
+      // Tính lương tạm tính
+      let salary = 0;
+      let salaryDetailText = '';
+      const formatMoney = (val) => new Intl.NumberFormat('vi-VN').format(Math.round(val)) + 'đ';
+
+      if (emp.salary_type === 'hourly') {
+        salary = totalHours * emp.salary_rate;
+        salaryDetailText = `💰 Lương tạm tính: <b>${formatMoney(salary)}</b>\n- Loại lương: Theo giờ (${formatMoney(emp.salary_rate)}/h)\n- Tổng số ngày làm: <b>${totalDays} ngày</b>`;
+      } else {
+        const standardDays = 26;
+        const dailyRate = emp.salary_rate / standardDays;
+        salary = dailyRate * totalDays;
+        salaryDetailText = `💰 Lương tạm tính: <b>${formatMoney(salary)}</b>\n- Loại lương: Cố định (${formatMoney(emp.salary_rate)}/tháng)\n- Lương 1 công: ${formatMoney(dailyRate)}/ngày\n- Số ngày công thực tế: <b>${totalDays}/${standardDays} công</b>`;
+      }
+
+      const msg = `📅 <b>Lịch sử chấm công: ${emp.name}</b>\nTháng ${now.getMonth() + 1}/${now.getFullYear()}\n\n⏱️ Tổng giờ làm: <b>${totalHours.toFixed(1)} giờ</b>\n${salaryDetailText}\n\nChi tiết:\n${logText || 'Chưa có ca làm nào được hoàn thành.'}`;
       await sendReply(msg);
       return res.status(200).send('OK');
     }
