@@ -178,7 +178,6 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
 
         <!-- Footer -->
         <div class="checkin-footer">
-          <button class="btn btn-sm btn-outline" id="unlink-device-btn">Hủy liên kết thiết bị</button>
           <a href="#/admin" class="admin-link">Quản lý →</a>
         </div>
       </div>
@@ -399,17 +398,7 @@ export default async function checkinPage(container) {
       });
     }
 
-    // ─── Unlink device button ────────────────────────────
-    const unlinkBtn = document.getElementById('unlink-device-btn');
-    if (unlinkBtn) {
-      unlinkBtn.addEventListener('click', () => {
-        if (confirm('Bạn có chắc muốn hủy liên kết thiết bị này? Bạn sẽ cần đăng ký lại.')) {
-          localStorage.removeItem(DEVICE_TOKEN_KEY);
-          toast.info('Đã hủy liên kết thiết bị.');
-          checkinPage(container);
-        }
-      });
-    }
+
   } catch (err) {
     console.error('Checkin page error:', err);
     container.innerHTML = `
