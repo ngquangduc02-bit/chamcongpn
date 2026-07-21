@@ -64,24 +64,45 @@ export function getCurrentPosition() {
   });
 }
 
-/**
- * Lấy IP address hiện tại
- * @returns {Promise<{ip: string, city: string, country: string}>}
- */
 export async function getIPInfo() {
-  try {
-    const response = await fetch('https://ipapi.co/json/');
-    if (!response.ok) throw new Error('Không thể lấy thông tin IP');
-    const data = await response.json();
-    return {
-      ip: data.ip,
-      city: data.city,
-      country: data.country_name,
-    };
-  } catch (error) {
-    console.warn('Không lấy được IP:', error);
-    return { ip: 'unknown', city: '', country: '' };
+  // Danh sách các dịch vụ lấy IP dự phòng
+  const providers = [
+    {
+      url: 'https://api.ipify.org?format=json',
+      parse: (data) => ({ ip: data.ip, city: '', country: '' })
+    },
+    {
+      url: 'https://ipapi.co/json/',
+      parse: (data) => ({ ip: data.ip, city: data.city || '', country: data.country_name || '' })
+    },
+    {
+      url: 'https://ipinfo.io/json',
+      parse: (data) => ({ ip: data.ip, city: data.city || '', country: data.country || '' })
+    }
+  ];
+
+  for (const provider of providers) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000); // Giới hạn chờ 4 giây mỗi API
+
+      const response = await fetch(provider.url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const data = await response.json();
+        const info = provider.parse(data);
+        if (info.ip) {
+          return info;
+        }
+      }
+    } catch (error) {
+      console.warn(`Lấy IP từ ${provider.url} không thành công, đang thử nguồn dự phòng...`, error);
+    }
   }
+
+  console.error('Tất cả các nguồn lấy IP đều thất bại.');
+  return { ip: 'unknown', city: '', country: '' };
 }
 
 /**
