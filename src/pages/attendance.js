@@ -215,7 +215,14 @@ export default async function attendancePage(container) {
 
   function renderRow(r) {
     const empName = r.employees?.name || 'Không rõ';
-    const hours = r.check_out ? (r.total_hours != null ? r.total_hours : calculateHours(r.check_in, r.check_out)) : null;
+    
+    let hours = null;
+    if (r.check_out) {
+      const raw = calculateHours(r.check_in, r.check_out);
+      const deduction = (r.deducted_minutes || 0) / 60;
+      hours = Math.max(0, raw - deduction);
+    }
+    
     const isWorking = !r.check_out;
     const statusBadge = isWorking
       ? '<span class="status-badge badge" style="background:var(--success-light,#dcfce7);color:var(--success,#16a34a);">Đang làm</span>'
@@ -258,7 +265,9 @@ export default async function attendancePage(container) {
     let totalHours = 0;
     records.forEach((r) => {
       if (r.check_out) {
-        totalHours += r.total_hours != null ? r.total_hours : calculateHours(r.check_in, r.check_out);
+        const raw = calculateHours(r.check_in, r.check_out);
+        const deduction = (r.deducted_minutes || 0) / 60;
+        totalHours += Math.max(0, raw - deduction);
       }
     });
 
@@ -608,7 +617,12 @@ export default async function attendancePage(container) {
       const checkinStr = formatTime(r.check_in);
       const checkoutStr = r.check_out ? formatTime(r.check_out) : 'Đang làm';
       
-      const hours = r.check_out ? (r.total_hours != null ? r.total_hours : calculateHours(r.check_in, r.check_out)) : 0;
+      let hours = 0;
+      if (r.check_out) {
+        const raw = calculateHours(r.check_in, r.check_out);
+        const deduction = (r.deducted_minutes || 0) / 60;
+        hours = Math.max(0, raw - deduction);
+      }
       const hoursStr = hours > 0 ? hours.toFixed(2) : '0';
       
       const deducted = r.deducted_minutes || 0;

@@ -16,8 +16,17 @@ export function calculateSalary(employee, attendanceRecords) {
 
   for (const record of attendanceRecords) {
     if (record.check_in && record.check_out) {
-      const hours = record.total_hours || 
-        (new Date(record.check_out) - new Date(record.check_in)) / (1000 * 60 * 60);
+      const rawHours = record.total_hours != null
+        ? Number(record.total_hours)
+        : (new Date(record.check_out) - new Date(record.check_in)) / (1000 * 60 * 60);
+      
+      // Nếu total_hours từ database chưa được khấu trừ (do chạy trigger cũ) hoặc được tính tay,
+      // ta kiểm tra và chủ động trừ đi số phút khấu trừ nếu giá trị đó chưa được áp dụng vào total_hours.
+      // Để an toàn và đồng bộ, ta tính toán lại giờ làm thực tế trực tiếp từ thời gian checkin/out và trừ đi số phút ăn nghỉ.
+      const rawDuration = (new Date(record.check_out) - new Date(record.check_in)) / (1000 * 60 * 60);
+      const deduction = (record.deducted_minutes || 0) / 60;
+      const hours = Math.max(0, rawDuration - deduction);
+      
       totalHours += hours;
 
       // Nhóm theo ngày

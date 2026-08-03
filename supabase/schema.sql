@@ -85,10 +85,11 @@ CREATE TABLE IF NOT EXISTS attendance (
     check_out_ip  TEXT,                                                -- Client IP at check-out
 
     -- Computed / metadata
-    total_hours   NUMERIC,                                             -- Auto-calculated via trigger
-    note          TEXT,                                                 -- Optional note (e.g. reason for manual edit)
-    is_edited     BOOLEAN DEFAULT false,                               -- Flag if record was manually edited by admin
-    created_at    TIMESTAMPTZ DEFAULT NOW()
+    total_hours      NUMERIC,                                             -- Auto-calculated via trigger
+    deducted_minutes INTEGER DEFAULT 0,                                   -- Minutes to deduct (break/meal time)
+    note             TEXT,                                                 -- Optional note (e.g. reason for manual edit)
+    is_edited        BOOLEAN DEFAULT false,                               -- Flag if record was manually edited by admin
+    created_at       TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Index for querying attendance by employee
@@ -139,9 +140,13 @@ BEGIN
     -- Only recalculate when check_out is set or changed
     IF NEW.check_out IS NOT NULL THEN
         NEW.total_hours := ROUND(
-            EXTRACT(EPOCH FROM (NEW.check_out - NEW.check_in)) / 3600.0,
+            (EXTRACT(EPOCH FROM (NEW.check_out - NEW.check_in)) / 3600.0) - (COALESCE(NEW.deducted_minutes, 0) / 60.0),
             2
         );
+        -- Đảm bảo tổng số giờ không bị âm
+        IF NEW.total_hours < 0 THEN
+            NEW.total_hours := 0;
+        END IF;
     ELSE
         NEW.total_hours := NULL;
     END IF;

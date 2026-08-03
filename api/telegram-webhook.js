@@ -135,7 +135,8 @@ export default async function handler(req, res) {
         records.forEach((r, i) => {
           if (r.check_out) {
             const duration = (new Date(r.check_out) - new Date(r.check_in)) / (1000 * 60 * 60);
-            const hours = r.total_hours != null ? Number(r.total_hours) : duration;
+            const deduction = (r.deducted_minutes || 0) / 60;
+            const hours = Math.max(0, duration - deduction);
             totalHours += hours;
 
             const d = new Date(r.check_in);
