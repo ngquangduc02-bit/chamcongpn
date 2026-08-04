@@ -1735,7 +1735,7 @@ tbody td {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: var(--space-6);
+  padding: var(--space-4); /* Giảm padding ngoài để card rộng hơn */
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -1747,19 +1747,39 @@ tbody td {
   display: none;
 }
 
+.checkin-container {
+  width: 100%;
+  max-width: 480px; /* Rộng hơn, gần full chiều ngang trên di động */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4); /* Khoảng cách giữa các khung */
+}
+
+.checkin-card {
+  background: #11111f !important; /* Khung xám sẫm tối giản */
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 16px !important;
+  padding: var(--space-6) var(--space-5) !important;
+  box-shadow: none !important;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .checkin-page .avatar-initial {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
+  width: 88px; /* Phóng to avatar lên 88px */
+  height: 88px;
   border-radius: var(--border-radius-full);
   background: var(--accent-gradient);
   color: #ffffff;
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   margin: 0 auto var(--space-3) auto;
-  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
   border: 2px solid rgba(255, 255, 255, 0.1);
   transition: transform var(--transition-base);
 }

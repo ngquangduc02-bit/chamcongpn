@@ -114,47 +114,47 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
     <div class="checkin-page">
       <div class="checkin-container">
 
-        <!-- Header / Greeting -->
-        <div class="checkin-greeting">
-          <div class="avatar-initial">${avatarContent}</div>
-          <h1 class="checkin-name">Xin chào, ${employee.name}!</h1>
-          <p class="greeting-role">${employee.position || 'Nhân viên'}</p>
+        <!-- Khung 1: Thông tin nhân viên & Thời gian -->
+        <div class="card checkin-card">
+          <div class="checkin-greeting">
+            <div class="avatar-initial">${avatarContent}</div>
+            <h1 class="checkin-name">Xin chào, ${employee.name}!</h1>
+            <p class="greeting-role">${employee.position || 'Nhân viên'}</p>
+          </div>
+          <div class="live-clock-section">
+            <div class="checkin-time" id="live-clock">--:--:--</div>
+            <div class="checkin-date" id="live-date">---</div>
+          </div>
         </div>
 
-        <!-- Live Clock -->
-        <div class="live-clock-section">
-          <div class="checkin-time" id="live-clock">--:--:--</div>
-          <div class="checkin-date" id="live-date">---</div>
+        <!-- Khung 2: Điểm danh & Vị trí -->
+        <div class="card checkin-card">
+          <div class="checkin-action" id="checkin-action">
+            ${isCheckedIn ? `
+              <div class="checked-in-info">
+                <span class="checkin-time-label">Đã vào lúc</span>
+                <span class="checkin-time-value">${checkinTime}</span>
+              </div>
+              <div class="elapsed-time" id="elapsed-time">Đang tính...</div>
+              <button class="checkin-btn checkin-btn--out" id="action-btn" data-attendance-id="${activeAttendance.id}">
+                <span class="checkin-btn-icon">${checkoutIcon}</span>
+                <span class="checkin-btn-label">CHECK OUT</span>
+              </button>
+            ` : `
+              <button class="checkin-btn checkin-btn--in" id="action-btn">
+                <span class="checkin-btn-icon">${checkinIcon}</span>
+                <span class="checkin-btn-label">CHECK IN</span>
+              </button>
+            `}
+          </div>
+          <div class="location-status" id="location-status" style="margin-top: 16px;">
+            <span class="location-icon">${locationIcon}</span>
+            <span class="location-text">Sẵn sàng xác minh vị trí</span>
+          </div>
         </div>
 
-        <!-- Check-in / Check-out button -->
-        <div class="checkin-action" id="checkin-action">
-          ${isCheckedIn ? `
-            <div class="checked-in-info">
-              <span class="checkin-time-label">Đã vào lúc</span>
-              <span class="checkin-time-value">${checkinTime}</span>
-            </div>
-            <div class="elapsed-time" id="elapsed-time">Đang tính...</div>
-            <button class="checkin-btn checkin-btn--out" id="action-btn" data-attendance-id="${activeAttendance.id}">
-              <span class="checkin-btn-icon">${checkoutIcon}</span>
-              <span class="checkin-btn-label">CHECK OUT</span>
-            </button>
-          ` : `
-            <button class="checkin-btn checkin-btn--in" id="action-btn">
-              <span class="checkin-btn-icon">${checkinIcon}</span>
-              <span class="checkin-btn-label">CHECK IN</span>
-            </button>
-          `}
-        </div>
-
-        <!-- Location status -->
-        <div class="location-status" id="location-status">
-          <span class="location-icon">${locationIcon}</span>
-          <span class="location-text">Sẵn sàng xác minh vị trí</span>
-        </div>
-
-        <!-- Today summary -->
-        <div class="card today-summary">
+        <!-- Khung 3: Thống kê hôm nay -->
+        <div class="card checkin-card today-summary">
           <h3 class="summary-title">${summaryIcon} Hôm nay</h3>
           <div class="summary-grid">
             <div class="summary-item">
@@ -187,19 +187,18 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
           `}
         </div>
 
-        </div>
-        
-        <!-- Xem lịch sử tháng này (Nhân viên tự xem) -->
-        <div style="width: 100%; max-width: 320px; margin: 0 auto;">
-          <button class="btn btn-outline btn-block mt-2" id="view-history-btn">
+        <!-- Nút Xem lịch sử -->
+        <div style="width: 100%; margin-top: 4px;">
+          <button class="btn btn-outline btn-block" id="view-history-btn">
             ${historyIcon} Xem lịch sử tháng này
           </button>
         </div>
 
         <!-- Footer -->
-        <div class="checkin-footer">
+        <div class="checkin-footer" style="margin-top: 8px;">
           <a href="#/admin" class="admin-link">Quản lý →</a>
         </div>
+
       </div>
     </div>
   `;
