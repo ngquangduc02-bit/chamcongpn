@@ -110,14 +110,14 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
         <!-- Header / Greeting -->
         <div class="checkin-greeting">
           <div class="avatar-initial">${nameInitial}</div>
-          <h1 class="greeting-name">Xin chào, ${employee.name}!</h1>
+          <h1 class="checkin-name">Xin chào, ${employee.name}!</h1>
           <p class="greeting-role">${employee.position || 'Nhân viên'}</p>
         </div>
 
         <!-- Live Clock -->
         <div class="live-clock-section">
-          <div class="live-clock" id="live-clock">--:--:--</div>
-          <div class="live-date" id="live-date">---</div>
+          <div class="checkin-time" id="live-clock">--:--:--</div>
+          <div class="checkin-date" id="live-date">---</div>
         </div>
 
         <!-- Check-in / Check-out button -->
@@ -128,12 +128,12 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
               <span class="checkin-time-value">${checkinTime}</span>
             </div>
             <div class="elapsed-time" id="elapsed-time">Đang tính...</div>
-            <button class="checkin-btn checkin-btn-out" id="action-btn" data-attendance-id="${activeAttendance.id}">
+            <button class="checkin-btn checkin-btn--out" id="action-btn" data-attendance-id="${activeAttendance.id}">
               <span class="checkin-btn-icon">${checkoutIcon}</span>
               <span class="checkin-btn-label">CHECK OUT</span>
             </button>
           ` : `
-            <button class="checkin-btn checkin-btn-in" id="action-btn">
+            <button class="checkin-btn checkin-btn--in" id="action-btn">
               <span class="checkin-btn-icon">${checkinIcon}</span>
               <span class="checkin-btn-label">CHECK IN</span>
             </button>

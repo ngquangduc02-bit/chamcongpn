@@ -1757,6 +1757,26 @@ tbody td {
   pointer-events: none;
 }
 
+.checkin-page .avatar-initial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--border-radius-full);
+  background: var(--accent-gradient);
+  color: #ffffff;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 auto var(--space-4) auto;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  transition: transform var(--transition-base);
+}
+.checkin-page .avatar-initial:hover {
+  transform: scale(1.05);
+}
+
 .checkin-greeting {
   font-size: var(--font-size-xl);
   color: var(--text-secondary);
@@ -3507,6 +3527,16 @@ body.theme-pink .checkin-btn:hover {
 body.theme-pink .navbar-menu {
   background: rgba(29, 15, 26, 0.95) !important;
   border-bottom-color: rgba(255, 105, 180, 0.2) !important;
+}
+
+/* Các vòng tròn hiệu ứng pulse màu hồng khi checkin/checkout */
+body.theme-pink .checkin-btn--in::before,
+body.theme-pink .checkin-btn--out::before {
+  border-color: var(--accent-start) !important;
+}
+body.theme-pink .checkin-btn--in::after,
+body.theme-pink .checkin-btn--out::after {
+  border-color: var(--accent-end) !important;
 }
 
 
