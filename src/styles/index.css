@@ -3444,6 +3444,68 @@ tbody td {
 
 
 /* ============================================================
+   37. PINK FEMININE THEME (Màu hồng nữ tính cho mã PIN 0111)
+   ============================================================ */
+body.theme-pink {
+  --bg-primary: #12080f; /* Tông tím/hồng cực tối */
+  --bg-secondary: #1d0f1a;
+  --bg-tertiary: #271424;
+  --bg-elevated: #351a31;
+  --bg-surface: rgba(39, 20, 36, 0.6);
+
+  --glass-bg: rgba(255, 192, 203, 0.04);
+  --glass-bg-hover: rgba(255, 192, 203, 0.08);
+  --glass-bg-active: rgba(255, 192, 203, 0.12);
+  --glass-border: rgba(255, 105, 180, 0.12);
+  --glass-border-hover: rgba(255, 105, 180, 0.22);
+
+  --accent-start: #ff69b4; /* Hồng phấn (Hot Pink) */
+  --accent-end: #ff1493; /* Hồng đậm (Deep Pink) */
+  --accent-gradient: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  --accent-gradient-hover: linear-gradient(135deg, #ff85c2, #ff3399);
+  --accent-soft: rgba(255, 105, 180, 0.18);
+  --accent-soft-border: rgba(255, 105, 180, 0.35);
+
+  --text-primary: #fff0f5;
+  --text-secondary: #fbb6ce;
+  --text-tertiary: #f687b3;
+  --text-muted: #d53f8c;
+  --text-accent: #ff69b4;
+
+  --border-default: rgba(255, 105, 180, 0.12);
+  --border-hover: rgba(255, 105, 180, 0.22);
+  --border-focus: var(--accent-start);
+
+  --shadow-glow-accent: 0 0 30px rgba(255, 105, 180, 0.35), 0 0 60px rgba(255, 20, 147, 0.2);
+}
+
+/* Tùy chỉnh avatar hình tròn màu hồng */
+body.theme-pink .avatar-initial {
+  background: var(--accent-gradient) !important;
+  box-shadow: var(--shadow-glow-accent) !important;
+}
+
+/* Nền chuyển động hồng nữ tính cho toàn trang */
+body.theme-pink::before {
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 0%, rgba(255, 105, 180, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 100%, rgba(255, 20, 147, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255, 192, 203, 0.04) 0%, transparent 60%) !important;
+}
+
+/* Nút bấm checkin của theme hồng dạng trái tim/hoa anh đào */
+body.theme-pink .checkin-btn {
+  background: var(--accent-gradient) !important;
+  box-shadow: var(--shadow-glow-accent) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+body.theme-pink .checkin-btn:hover {
+  transform: scale(1.05);
+}
+
+
+/* ============================================================
    FIN – Hết file CSS
    ============================================================ */
+
 

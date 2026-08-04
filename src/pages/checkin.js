@@ -78,8 +78,16 @@ function renderRegistrationPage() {
 }
 
 function renderCheckinPage(employee, activeAttendance, todayRecords) {
+  const isPinkTheme = employee.pin === '0111';
   const nameInitial = (employee.name || '?').charAt(0).toUpperCase();
   const isCheckedIn = !!activeAttendance;
+
+  // Emojis based on theme
+  const checkinIcon = isPinkTheme ? '🌸' : '👋';
+  const checkoutIcon = isPinkTheme ? '💖' : '🚪';
+  const locationIcon = isPinkTheme ? '🌸' : '📍';
+  const summaryIcon = isPinkTheme ? '💖' : '📊';
+  const historyIcon = isPinkTheme ? '💖' : '📅';
 
   // Today summary
   let todayTotalHours = 0;
@@ -121,12 +129,12 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
             </div>
             <div class="elapsed-time" id="elapsed-time">Đang tính...</div>
             <button class="checkin-btn checkin-btn-out" id="action-btn" data-attendance-id="${activeAttendance.id}">
-              <span class="checkin-btn-icon">🚪</span>
+              <span class="checkin-btn-icon">${checkoutIcon}</span>
               <span class="checkin-btn-label">CHECK OUT</span>
             </button>
           ` : `
             <button class="checkin-btn checkin-btn-in" id="action-btn">
-              <span class="checkin-btn-icon">👋</span>
+              <span class="checkin-btn-icon">${checkinIcon}</span>
               <span class="checkin-btn-label">CHECK IN</span>
             </button>
           `}
@@ -134,13 +142,13 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
 
         <!-- Location status -->
         <div class="location-status" id="location-status">
-          <span class="location-icon">📍</span>
+          <span class="location-icon">${locationIcon}</span>
           <span class="location-text">Sẵn sàng xác minh vị trí</span>
         </div>
 
         <!-- Today summary -->
         <div class="card today-summary">
-          <h3 class="summary-title">📊 Hôm nay</h3>
+          <h3 class="summary-title">${summaryIcon} Hôm nay</h3>
           <div class="summary-grid">
             <div class="summary-item">
               <span class="summary-value" id="today-hours">${formatHours(todayTotalHours)}</span>
@@ -155,12 +163,17 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
           ${todayRecords && todayRecords.length > 0 ? `
             <div class="summary-history">
               <h4 class="history-title">Lịch sử hôm nay</h4>
-              ${todayRecords.map((r) => `
-                <div class="history-row">
-                  <span class="history-time">${formatTime(r.check_in)} → ${r.check_out ? formatTime(r.check_out) : '...'}</span>
-                  <span class="history-hours">${r.check_out ? formatHours(calculateHours(r.check_in, r.check_out)) : 'Đang làm'}</span>
-                </div>
-              `).join('')}
+              ${todayRecords.map((r) => {
+                const raw = calculateHours(r.check_in, r.check_out);
+                const deduction = (r.deducted_minutes || 0) / 60;
+                const hours = Math.max(0, raw - deduction);
+                return `
+                  <div class="history-row">
+                    <span class="history-time">${formatTime(r.check_in)} → ${r.check_out ? formatTime(r.check_out) : '...'}</span>
+                    <span class="history-hours">${r.check_out ? formatHours(hours) : 'Đang làm'}</span>
+                  </div>
+                `;
+              }).join('')}
             </div>
           ` : `
             <p class="summary-empty">Chưa có phiên làm việc nào hôm nay</p>
@@ -172,7 +185,7 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
         <!-- Xem lịch sử tháng này (Nhân viên tự xem) -->
         <div style="width: 100%; max-width: 320px; margin: 0 auto;">
           <button class="btn btn-outline btn-block mt-2" id="view-history-btn">
-            📅 Xem lịch sử tháng này
+            ${historyIcon} Xem lịch sử tháng này
           </button>
         </div>
 
@@ -231,6 +244,14 @@ export default async function checkinPage(container) {
 
     const employee = device.employees; // joined data
     const employeeId = employee.id;
+    const isPinkTheme = employee.pin === '0111';
+
+    // Bật/tắt theme hồng dựa trên mã PIN 0111
+    if (isPinkTheme) {
+      document.body.classList.add('theme-pink');
+    } else {
+      document.body.classList.remove('theme-pink');
+    }
 
     // Fetch active attendance + today records in parallel
     const { start, end } = getTodayRange();
@@ -418,6 +439,7 @@ export default async function checkinPage(container) {
   // ─── Cleanup ───────────────────────────────────────────
   return () => {
     destroyed = true;
+    document.body.classList.remove('theme-pink'); // Xóa lớp CSS khi thoát trang
     if (clockInterval) clearInterval(clockInterval);
     if (elapsedInterval) clearInterval(elapsedInterval);
   };
