@@ -3503,6 +3503,12 @@ body.theme-pink .checkin-btn:hover {
   transform: scale(1.05);
 }
 
+/* Tùy chỉnh màu nền cho thanh menu di động ở theme hồng */
+body.theme-pink .navbar-menu {
+  background: rgba(29, 15, 26, 0.95) !important;
+  border-bottom-color: rgba(255, 105, 180, 0.2) !important;
+}
+
 
 /* ============================================================
    FIN – Hết file CSS

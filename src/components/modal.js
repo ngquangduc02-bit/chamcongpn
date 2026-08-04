@@ -30,7 +30,7 @@ export function showModal(options) {
   overlay.id = 'modal-overlay';
 
   const actionsHtml = actions.length > 0
-    ? `<div class="modal-actions">
+    ? `<div class="modal-footer">
         ${actions.map((a, i) => `<button class="btn ${a.className || 'btn-outline'}" data-action-index="${i}">${a.label}</button>`).join('')}
        </div>`
     : '';
