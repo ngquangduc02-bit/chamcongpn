@@ -1739,148 +1739,91 @@ tbody td {
   text-align: center;
   position: relative;
   overflow: hidden;
+  background: #090911; /* Nền tối phẳng tối giản */
 }
 
-/* Nền gradient động cho trang check-in */
+/* Nền tối giản phẳng không hoạt họa */
 .checkin-page::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background:
-    radial-gradient(ellipse at 30% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
-  animation: bgFloat 15s ease-in-out infinite;
-  pointer-events: none;
+  display: none;
 }
 
 .checkin-page .avatar-initial {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   border-radius: var(--border-radius-full);
   background: var(--accent-gradient);
   color: #ffffff;
-  font-size: var(--font-size-3xl);
+  font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
-  margin: 0 auto var(--space-4) auto;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  margin: 0 auto var(--space-3) auto;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   transition: transform var(--transition-base);
 }
 .checkin-page .avatar-initial:hover {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .checkin-greeting {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   color: var(--text-secondary);
   margin-bottom: var(--space-2);
-  animation: fadeIn 0.6s ease;
 }
 
 .checkin-name {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-black);
-  color: var(--text-primary);
-  margin-bottom: var(--space-8);
-  animation: fadeIn 0.6s ease 0.1s both;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: #ffffff;
+  margin-bottom: var(--space-6);
 }
 
 .checkin-time {
-  font-size: var(--font-size-5xl);
-  font-weight: var(--font-weight-black);
-  color: var(--text-primary);
-  letter-spacing: var(--letter-spacing-tight);
-  margin-bottom: var(--space-2);
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.05em;
+  margin-bottom: var(--space-1);
   font-variant-numeric: tabular-nums;
-  animation: fadeIn 0.6s ease 0.2s both;
+  font-family: monospace, var(--font-family); /* Hiển thị đồng hồ monospace rõ ràng */
 }
 
 .checkin-date {
-  font-size: var(--font-size-lg);
-  color: var(--text-tertiary);
-  margin-bottom: var(--space-12);
-  animation: fadeIn 0.6s ease 0.3s both;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-8);
 }
 
-/* Nút chấm công lớn */
+/* Nút chấm công tối giản sạch sẽ */
 .checkin-btn {
   position: relative;
-  width: 180px;
-  height: 180px;
+  width: 140px;
+  height: 140px;
   border-radius: var(--border-radius-full);
   border: none;
   font-family: var(--font-family);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
   color: #fff;
   cursor: pointer;
   transition: all var(--transition-base);
   z-index: 1;
-  animation: fadeIn 0.6s ease 0.4s both;
 }
 
 .checkin-btn--in {
-  background: var(--success-gradient);
-  box-shadow:
-    0 0 40px rgba(16, 185, 129, 0.3),
-    0 0 80px rgba(16, 185, 129, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  background: var(--success);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
 .checkin-btn--out {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  box-shadow:
-    0 0 40px rgba(239, 68, 68, 0.3),
-    0 0 80px rgba(239, 68, 68, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-/* Vòng tròn hiệu ứng pulse quanh nút */
-.checkin-btn::before {
-  content: '';
-  position: absolute;
-  inset: -12px;
-  border-radius: var(--border-radius-full);
-  border: 2px solid;
-  opacity: 0.3;
-  animation: checkinPulse 2.5s ease-in-out infinite;
-}
-
-.checkin-btn--in::before {
-  border-color: var(--success);
-}
-
-.checkin-btn--out::before {
-  border-color: var(--danger);
-}
-
-.checkin-btn::after {
-  content: '';
-  position: absolute;
-  inset: -24px;
-  border-radius: var(--border-radius-full);
-  border: 1px solid;
-  opacity: 0.15;
-  animation: checkinPulse 2.5s ease-in-out 0.5s infinite;
-}
-
-.checkin-btn--in::after {
-  border-color: var(--success);
-}
-
-.checkin-btn--out::after {
-  border-color: var(--danger);
+  background: var(--danger);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 }
 
 .checkin-btn:hover {
-  transform: scale(1.06);
+  transform: scale(1.04);
 }
 
 .checkin-btn:active {
@@ -3464,79 +3407,109 @@ tbody td {
 
 
 /* ============================================================
-   37. PINK FEMININE THEME (Màu hồng nữ tính cho mã PIN 0111)
+   37. PINK FEMININE THEME (Màu hồng pastel tối giản cho PIN 0111)
    ============================================================ */
 body.theme-pink {
-  --bg-primary: #12080f; /* Tông tím/hồng cực tối */
-  --bg-secondary: #1d0f1a;
-  --bg-tertiary: #271424;
-  --bg-elevated: #351a31;
-  --bg-surface: rgba(39, 20, 36, 0.6);
+  --bg-primary: #fff2f4; /* Nền sáng hồng pastel cực nhạt */
+  --bg-secondary: #ffffff; /* Thẻ nền trắng tinh khôi */
+  --bg-tertiary: #ffe5ea;
+  --bg-elevated: #ffd5dd;
+  --bg-surface: rgba(255, 255, 255, 0.8);
 
-  --glass-bg: rgba(255, 192, 203, 0.04);
-  --glass-bg-hover: rgba(255, 192, 203, 0.08);
-  --glass-bg-active: rgba(255, 192, 203, 0.12);
-  --glass-border: rgba(255, 105, 180, 0.12);
-  --glass-border-hover: rgba(255, 105, 180, 0.22);
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-bg-hover: rgba(255, 255, 255, 0.9);
+  --glass-bg-active: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(255, 117, 143, 0.18);
+  --glass-border-hover: rgba(255, 117, 143, 0.3);
 
-  --accent-start: #ff69b4; /* Hồng phấn (Hot Pink) */
-  --accent-end: #ff1493; /* Hồng đậm (Deep Pink) */
+  --accent-start: #ff7e95; /* Hồng pastel ngọt ngào */
+  --accent-end: #ff9eb0;
   --accent-gradient: linear-gradient(135deg, var(--accent-start), var(--accent-end));
-  --accent-gradient-hover: linear-gradient(135deg, #ff85c2, #ff3399);
-  --accent-soft: rgba(255, 105, 180, 0.18);
-  --accent-soft-border: rgba(255, 105, 180, 0.35);
+  --accent-gradient-hover: linear-gradient(135deg, #ffa0b2, #ffb8c7);
+  --accent-soft: rgba(255, 117, 143, 0.12);
+  --accent-soft-border: rgba(255, 117, 143, 0.25);
 
-  --text-primary: #fff0f5;
-  --text-secondary: #fbb6ce;
-  --text-tertiary: #f687b3;
-  --text-muted: #d53f8c;
-  --text-accent: #ff69b4;
+  --text-primary: #4b1620; /* Màu chữ nâu hồng đậm - tương phản cực kỳ rõ ràng, dễ đọc */
+  --text-secondary: #702632;
+  --text-tertiary: #9b4b58;
+  --text-muted: #c07d8a;
+  --text-accent: #ff4766;
 
-  --border-default: rgba(255, 105, 180, 0.12);
-  --border-hover: rgba(255, 105, 180, 0.22);
+  --border-default: rgba(255, 117, 143, 0.18);
+  --border-hover: rgba(255, 117, 143, 0.3);
   --border-focus: var(--accent-start);
 
-  --shadow-glow-accent: 0 0 30px rgba(255, 105, 180, 0.35), 0 0 60px rgba(255, 20, 147, 0.2);
+  --shadow-glow-accent: 0 4px 15px rgba(255, 117, 143, 0.15);
 }
 
 /* Tùy chỉnh avatar hình tròn màu hồng */
 body.theme-pink .avatar-initial {
   background: var(--accent-gradient) !important;
-  box-shadow: var(--shadow-glow-accent) !important;
+  box-shadow: 0 4px 10px rgba(255, 117, 143, 0.25) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
-/* Nền chuyển động hồng nữ tính cho toàn trang */
-body.theme-pink::before {
-  background:
-    radial-gradient(ellipse 80% 60% at 10% 0%, rgba(255, 105, 180, 0.1) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 90% 100%, rgba(255, 20, 147, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255, 192, 203, 0.04) 0%, transparent 60%) !important;
+/* Nền phẳng tối giản hồng phấn cho trang checkin */
+body.theme-pink .checkin-page {
+  background: #fff2f4 !important;
 }
 
-/* Nút bấm checkin của theme hồng dạng trái tim/hoa anh đào */
+/* Ẩn hình nền trượt động */
+body.theme-pink .checkin-page::before {
+  display: none !important;
+}
+
+/* Tấm card nền trắng trong suốt ở di động */
+body.theme-pink .checkin-page .card {
+  background: #ffffff !important;
+  border: 1px solid #ffd5dd !important;
+  box-shadow: 0 4px 20px rgba(255, 117, 143, 0.05) !important;
+}
+
+/* Đảm bảo đồng hồ và tên có độ tương phản cao, màu tối */
+body.theme-pink .checkin-time,
+body.theme-pink .checkin-name {
+  color: #4b1620 !important;
+}
+
+body.theme-pink .checkin-greeting p,
+body.theme-pink .checkin-date,
+body.theme-pink .location-text,
+body.theme-pink .checkin-time-label,
+body.theme-pink .elapsed-time {
+  color: #702632 !important;
+}
+
+body.theme-pink .admin-link {
+  color: #9b4b58 !important;
+}
+
+/* Nút bấm checkin của theme hồng dạng tối giản */
 body.theme-pink .checkin-btn {
   background: var(--accent-gradient) !important;
-  box-shadow: var(--shadow-glow-accent) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(255, 117, 143, 0.3) !important;
+  border: none !important;
+  color: #ffffff !important;
 }
 body.theme-pink .checkin-btn:hover {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 /* Tùy chỉnh màu nền cho thanh menu di động ở theme hồng */
 body.theme-pink .navbar-menu {
-  background: rgba(29, 15, 26, 0.95) !important;
-  border-bottom-color: rgba(255, 105, 180, 0.2) !important;
+  background: rgba(255, 242, 244, 0.98) !important;
+  border-bottom-color: rgba(255, 117, 143, 0.2) !important;
 }
 
-/* Các vòng tròn hiệu ứng pulse màu hồng khi checkin/checkout */
-body.theme-pink .checkin-btn--in::before,
-body.theme-pink .checkin-btn--out::before {
-  border-color: var(--accent-start) !important;
+/* Đồng bộ các thẻ text của link menu trên mobile */
+body.theme-pink .navbar-link {
+  color: #702632 !important;
 }
-body.theme-pink .checkin-btn--in::after,
-body.theme-pink .checkin-btn--out::after {
-  border-color: var(--accent-end) !important;
+body.theme-pink .navbar-link.active {
+  background: rgba(255, 117, 143, 0.12) !important;
+  border-color: rgba(255, 117, 143, 0.25) !important;
+  color: #4b1620 !important;
 }
 
 
