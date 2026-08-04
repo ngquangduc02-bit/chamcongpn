@@ -97,12 +97,17 @@ export default async function employeesPage(container) {
             const statusClass = emp.is_active ? 'status-active' : 'status-inactive';
             const initial = emp.name.charAt(0).toUpperCase();
 
+            // Xác định Avatar hiển thị (ảnh tải lên, emoji hoặc ký tự đầu)
+            const avatarContent = emp.avatar_url
+              ? (emp.avatar_url.startsWith('data:') || emp.avatar_url.startsWith('http')
+                ? `<img src="${emp.avatar_url}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-default);" />`
+                : `<div class="avatar-initial" style="width: 50px; height: 50px; font-size: 1.4rem; background: var(--bg-elevated); border: 2px solid var(--border-default); display: flex; align-items: center; justify-content: center; border-radius: 50%;">${emp.avatar_url}</div>`)
+              : `<div class="avatar-initial" style="width: 50px; height: 50px; font-size: 1.5rem; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%;">${initial}</div>`;
+
             return `
               <div class="card employee-card ${!emp.is_active ? 'inactive-card' : ''}" style="position: relative;">
                 <div class="flex gap-3 align-center mb-3">
-                  <div class="avatar-initial" style="width: 50px; height: 50px; font-size: 1.5rem; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
-                    ${initial}
-                  </div>
+                  ${avatarContent}
                   <div>
                     <h3 class="employee-name" style="margin:0; font-size: 1.2rem; color: var(--text-h);">${emp.name}</h3>
                     <div class="flex gap-2 align-center mt-1">
@@ -219,6 +224,46 @@ export default async function employeesPage(container) {
             <input type="number" id="modal-salary-rate" class="form-input" value="${employee?.salary_rate || ''}" required placeholder="VD: 30000" />
           </div>
         </div>
+        
+        <!-- Bổ sung phần chọn/tải ảnh đại diện (Avatar) -->
+        <div class="form-group mt-2">
+          <label class="form-label">Ảnh đại diện (Avatar)</label>
+          <div class="avatar-picker-container flex gap-3 align-center" style="margin-top:8px;">
+            <div class="avatar-preview-box" id="avatar-preview-box" style="width:60px; height:60px; border-radius:50%; background:#1d1d36; border:1px dashed var(--border-default); display:flex; align-items:center; justify-content:center; font-size:1.8rem; overflow:hidden;">
+              ${employee?.avatar_url 
+                ? (employee.avatar_url.startsWith('data:') || employee.avatar_url.startsWith('http')
+                  ? `<img src="${employee.avatar_url}" style="width:100%; height:100%; object-fit:cover;" />`
+                  : employee.avatar_url) 
+                : '👤'}
+            </div>
+            
+            <div class="avatar-picker-controls flex-1">
+              <div class="flex gap-2 mb-2">
+                <button type="button" class="btn btn-outline btn-sm" id="btn-upload-avatar" style="font-size:0.8rem; padding:4px 10px;">
+                  📤 Tải ảnh
+                </button>
+                <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" />
+                
+                <button type="button" class="btn btn-outline btn-sm text-danger" id="btn-clear-avatar" style="font-size:0.8rem; padding:4px 10px; display:${employee?.avatar_url ? 'inline-block' : 'none'};">
+                  🗑️ Xóa
+                </button>
+              </div>
+              
+              <div class="avatar-emoji-list flex gap-2" style="flex-wrap:wrap;">
+                <span class="emoji-opt" style="cursor:pointer; font-size:1.3rem; padding:2px;" data-emoji="🧑‍🍳">🧑‍🍳</span>
+                <span class="emoji-opt" style="cursor:pointer; font-size:1.3rem; padding:2px;" data-emoji="👩‍🍳">👩‍🍳</span>
+                <span class="emoji-opt" style="cursor:pointer; font-size:1.3rem; padding:2px;" data-emoji="🦊">🦊</span>
+                <span class="emoji-opt" style="cursor:pointer; font-size:1.3rem; padding:2px;" data-emoji="🐼">🐼</span>
+                <span class="emoji-opt" style="cursor:pointer; font-size:1.3rem; padding:2px;" data-emoji="🦁">🦁</span>
+                <span class="emoji-opt" style="cursor:pointer; font-size:1.3rem; padding:2px;" data-emoji="🐯">🐯</span>
+                <span class="emoji-opt" style="cursor:pointer; font-size:1.3rem; padding:2px;" data-emoji="🐰">🐰</span>
+                <span class="emoji-opt" style="cursor:pointer; font-size:1.3rem; padding:2px;" data-emoji="🐨">🐨</span>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="modal-avatar-url" value="${employee?.avatar_url || ''}" />
+        </div>
+
         ${isEdit ? `
           <div class="form-group mt-2">
             <label class="form-label flex align-center gap-2">
@@ -252,6 +297,7 @@ export default async function employeesPage(container) {
             const phone = document.getElementById('modal-phone').value.trim();
             const salary_type = document.getElementById('modal-salary-type').value;
             const salary_rate = parseFloat(document.getElementById('modal-salary-rate').value);
+            const avatar_url = document.getElementById('modal-avatar-url').value;
             const is_active = isEdit ? document.getElementById('modal-is-active').checked : true;
 
             if (pin.length < 4 || pin.length > 6) {
@@ -259,7 +305,7 @@ export default async function employeesPage(container) {
               return;
             }
 
-            const data = { name, pin, phone, salary_type, salary_rate, is_active };
+            const data = { name, pin, phone, salary_type, salary_rate, avatar_url, is_active };
 
             try {
               if (isEdit) {
@@ -296,6 +342,71 @@ export default async function employeesPage(container) {
 
     typeSelect.addEventListener('change', updateLabel);
     updateLabel(); // run initial
+
+    // Đăng ký các sự kiện cho bộ chọn ảnh đại diện (avatar picker)
+    setTimeout(() => {
+      const uploadBtn = document.getElementById('btn-upload-avatar');
+      const fileInput = document.getElementById('avatar-file-input');
+      const clearBtn = document.getElementById('btn-clear-avatar');
+      const avatarUrlInput = document.getElementById('modal-avatar-url');
+      const previewBox = document.getElementById('avatar-preview-box');
+
+      uploadBtn?.addEventListener('click', () => fileInput?.click());
+
+      fileInput?.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+          toast.warning('Ảnh quá lớn! Vui lòng chọn ảnh dưới 2MB.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            // Nén ảnh bằng Canvas xuống 128x128px
+            const canvas = document.createElement('canvas');
+            const size = 128;
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Cắt ảnh theo tỉ lệ vuông ở tâm
+            const minSize = Math.min(img.width, img.height);
+            const sx = (img.width - minSize) / 2;
+            const sy = (img.height - minSize) / 2;
+            ctx.drawImage(img, sx, sy, minSize, minSize, 0, 0, size, size);
+            
+            // Chuyển sang Data URL dạng JPEG với chất lượng 85%
+            const base64 = canvas.toDataURL('image/jpeg', 0.85);
+            
+            previewBox.innerHTML = `<img src="${base64}" style="width:100%; height:100%; object-fit:cover;" />`;
+            avatarUrlInput.value = base64;
+            if (clearBtn) clearBtn.style.display = 'inline-block';
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      clearBtn?.addEventListener('click', () => {
+        previewBox.innerHTML = '👤';
+        avatarUrlInput.value = '';
+        clearBtn.style.display = 'none';
+        if (fileInput) fileInput.value = '';
+      });
+
+      document.querySelectorAll('.avatar-emoji-list .emoji-opt').forEach(opt => {
+        opt.addEventListener('click', () => {
+          const emoji = opt.textContent.trim();
+          previewBox.innerHTML = emoji;
+          avatarUrlInput.value = emoji;
+          if (clearBtn) clearBtn.style.display = 'inline-block';
+        });
+      });
+    }, 50);
   }
 
   // Load first time

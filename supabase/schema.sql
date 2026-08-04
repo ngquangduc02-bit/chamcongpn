@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS employees (
                     CHECK (salary_type IN ('hourly', 'monthly')),      -- Pay model
     salary_rate NUMERIC NOT NULL DEFAULT 0,                            -- Hourly rate or monthly salary amount
     is_active   BOOLEAN DEFAULT true,                                  -- Soft-delete / deactivation flag
+    avatar_url  TEXT,                                                  -- Image URL or base64 data URL for employee avatar
     created_at  TIMESTAMPTZ DEFAULT NOW(),
 
     -- Ensure PIN is 4-6 digits

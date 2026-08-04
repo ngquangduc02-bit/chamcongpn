@@ -103,13 +103,20 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
 
   const checkinTime = isCheckedIn ? formatTime(activeAttendance.check_in) : null;
 
+  // Xác định nội dung Avatar hiển thị (ảnh tròn, emoji hoặc chữ cái đầu)
+  const avatarContent = employee.avatar_url
+    ? (employee.avatar_url.startsWith('data:') || employee.avatar_url.startsWith('http')
+      ? `<img src="${employee.avatar_url}" class="avatar-image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />`
+      : `<span class="avatar-emoji">${employee.avatar_url}</span>`)
+    : nameInitial;
+
   return `
     <div class="checkin-page">
       <div class="checkin-container">
 
         <!-- Header / Greeting -->
         <div class="checkin-greeting">
-          <div class="avatar-initial">${nameInitial}</div>
+          <div class="avatar-initial">${avatarContent}</div>
           <h1 class="checkin-name">Xin chào, ${employee.name}!</h1>
           <p class="greeting-role">${employee.position || 'Nhân viên'}</p>
         </div>

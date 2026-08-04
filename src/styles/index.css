@@ -3513,6 +3513,36 @@ body.theme-pink .navbar-link.active {
 }
 
 
+/* Styling cho bộ chọn ảnh đại diện avatar */
+.avatar-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.emoji-opt {
+  display: inline-block;
+  transition: transform var(--transition-base);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-1);
+}
+.emoji-opt:hover {
+  transform: scale(1.25);
+  background: var(--glass-bg-hover);
+}
+.emoji-opt:active {
+  transform: scale(0.95);
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+
 /* ============================================================
    FIN – Hết file CSS
    ============================================================ */
