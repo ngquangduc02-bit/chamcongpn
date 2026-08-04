@@ -114,21 +114,25 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
     <div class="checkin-page">
       <div class="checkin-container">
 
-        <!-- Khung 1: Thông tin nhân viên & Thời gian -->
+        <!-- Một khung duy nhất chứa tất cả thông tin điểm danh -->
         <div class="card checkin-card">
+          
+          <!-- Phần 1: Nhân viên & Lời chào -->
           <div class="checkin-greeting">
             <div class="avatar-initial">${avatarContent}</div>
             <h1 class="checkin-name">Xin chào, ${employee.name}!</h1>
             <p class="greeting-role">${employee.position || 'Nhân viên'}</p>
           </div>
+
+          <!-- Phần 2: Thời gian hiện tại -->
           <div class="live-clock-section">
             <div class="checkin-time" id="live-clock">--:--:--</div>
             <div class="checkin-date" id="live-date">---</div>
           </div>
-        </div>
 
-        <!-- Khung 2: Điểm danh & Vị trí -->
-        <div class="card checkin-card">
+          <div class="checkin-divider"></div>
+
+          <!-- Phần 3: Nút điểm danh & Định vị -->
           <div class="checkin-action" id="checkin-action">
             ${isCheckedIn ? `
               <div class="checked-in-info">
@@ -151,40 +155,43 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
             <span class="location-icon">${locationIcon}</span>
             <span class="location-text">Sẵn sàng xác minh vị trí</span>
           </div>
-        </div>
 
-        <!-- Khung 3: Thống kê hôm nay -->
-        <div class="card checkin-card today-summary">
-          <h3 class="summary-title">${summaryIcon} Hôm nay</h3>
-          <div class="summary-grid">
-            <div class="summary-item">
-              <span class="summary-value" id="today-hours">${formatHours(todayTotalHours)}</span>
-              <span class="summary-label">Tổng giờ làm</span>
+          <div class="checkin-divider"></div>
+
+          <!-- Phần 4: Thống kê hôm nay -->
+          <div class="today-summary" style="margin: 0; background: transparent; border: none; padding: 0;">
+            <h3 class="summary-title" style="margin-top: 0;">${summaryIcon} Hôm nay</h3>
+            <div class="summary-grid" style="margin-bottom: 16px;">
+              <div class="summary-item">
+                <span class="summary-value" id="today-hours">${formatHours(todayTotalHours)}</span>
+                <span class="summary-label">Tổng giờ làm</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-value" id="today-sessions">${todaySessionCount}</span>
+                <span class="summary-label">Phiên hoàn tất</span>
+              </div>
             </div>
-            <div class="summary-item">
-              <span class="summary-value" id="today-sessions">${todaySessionCount}</span>
-              <span class="summary-label">Phiên hoàn tất</span>
-            </div>
+
+            ${todayRecords && todayRecords.length > 0 ? `
+              <div class="summary-history">
+                <h4 class="history-title">Lịch sử hôm nay</h4>
+                ${todayRecords.map((r) => {
+                  const raw = calculateHours(r.check_in, r.check_out);
+                  const deduction = (r.deducted_minutes || 0) / 60;
+                  const hours = Math.max(0, raw - deduction);
+                  return `
+                    <div class="history-row">
+                      <span class="history-time">${formatTime(r.check_in)} → ${r.check_out ? formatTime(r.check_out) : '...'}</span>
+                      <span class="history-hours">${r.check_out ? formatHours(hours) : 'Đang làm'}</span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            ` : `
+              <p class="summary-empty">Chưa có phiên làm việc nào hôm nay</p>
+            `}
           </div>
 
-          ${todayRecords && todayRecords.length > 0 ? `
-            <div class="summary-history">
-              <h4 class="history-title">Lịch sử hôm nay</h4>
-              ${todayRecords.map((r) => {
-                const raw = calculateHours(r.check_in, r.check_out);
-                const deduction = (r.deducted_minutes || 0) / 60;
-                const hours = Math.max(0, raw - deduction);
-                return `
-                  <div class="history-row">
-                    <span class="history-time">${formatTime(r.check_in)} → ${r.check_out ? formatTime(r.check_out) : '...'}</span>
-                    <span class="history-hours">${r.check_out ? formatHours(hours) : 'Đang làm'}</span>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          ` : `
-            <p class="summary-empty">Chưa có phiên làm việc nào hôm nay</p>
-          `}
         </div>
 
         <!-- Nút Xem lịch sử -->

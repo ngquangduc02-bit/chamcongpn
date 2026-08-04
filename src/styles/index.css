@@ -1767,6 +1767,11 @@ tbody td {
   box-sizing: border-box;
 }
 
+.checkin-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+  margin: var(--space-5) 0 !important;
+}
+
 .checkin-page .avatar-initial {
   display: inline-flex;
   align-items: center;
@@ -3530,6 +3535,10 @@ body.theme-pink .navbar-link.active {
   background: rgba(255, 117, 143, 0.12) !important;
   border-color: rgba(255, 117, 143, 0.25) !important;
   color: #4b1620 !important;
+}
+
+body.theme-pink .checkin-divider {
+  border-top: 1px solid #ffd5dd !important;
 }
 
 
