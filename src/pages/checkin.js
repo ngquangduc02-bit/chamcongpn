@@ -12,6 +12,7 @@ import {
   getActiveAttendance,
   getAttendanceByDate,
   getSettings,
+  getDevicesByEmployee,
 } from '../supabase.js';
 import { navigate } from '../utils/router.js';
 import { getCurrentPosition, getIPInfo, verifyLocation, verifyIP } from '../utils/location.js';
@@ -515,6 +516,14 @@ async function showRegistration(container) {
         toast.error('Mã PIN không đúng!');
         document.getElementById('pin-input').value = '';
         document.getElementById('pin-input').focus();
+        return;
+      }
+
+      // Kiểm tra xem nhân viên đã có thiết bị nào đang hoạt động chưa
+      const devices = await getDevicesByEmployee(employeeId);
+      const activeDevice = devices.find((d) => d.is_active === true);
+      if (activeDevice) {
+        toast.error('Nhân viên này đã được liên kết với một thiết bị khác! Vui lòng liên hệ Admin để hủy liên kết thiết bị cũ trước.');
         return;
       }
 
