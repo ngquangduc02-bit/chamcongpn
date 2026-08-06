@@ -182,7 +182,7 @@ export async function getActiveAttendance(employeeId) {
 export async function getAttendanceByDate(startDate, endDate, employeeId = null) {
   let query = supabase
     .from('attendance')
-    .select('*, employees(name)')
+    .select('*, employees(name, pin)')
     .gte('check_in', startDate)
     .lte('check_in', endDate)
     .order('check_in', { ascending: false });

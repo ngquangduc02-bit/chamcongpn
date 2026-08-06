@@ -122,9 +122,11 @@ export default async function dashboard(container) {
                 ? calculateHours(r.check_in, r.check_out)
                 : calculateHours(r.check_in, new Date().toISOString());
               const name = r.employees?.name || 'Không rõ';
+              const isPink = r.employees?.pin === '0111' || name.includes('Thảo');
+              const nameHtml = isPink ? `<span class="pink-sparkle-name">${name}</span>` : `<strong>${name}</strong>`;
               return `
                 <tr>
-                  <td><strong>${name}</strong></td>
+                  <td>${nameHtml}</td>
                   <td>${formatTime(r.check_in)}</td>
                   <td>${r.check_out
                     ? formatTime(r.check_out)

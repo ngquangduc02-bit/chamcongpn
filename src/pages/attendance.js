@@ -214,10 +214,11 @@ export default async function attendancePage(container) {
   }
 
   function renderRow(r) {
-    const isPinkEmp = r.employees?.pin === '0111';
+    const empName = r.employees?.name || 'Không rõ';
+    const isPinkEmp = r.employees?.pin === '0111' || empName.includes('Thảo');
     const empNameHtml = isPinkEmp 
-      ? `<span class="pink-sparkle-name">${r.employees?.name}</span>` 
-      : `<strong>${r.employees?.name || 'Không rõ'}</strong>`;
+      ? `<span class="pink-sparkle-name">${empName}</span>` 
+      : `<strong>${empName}</strong>`;
     
     let hours = null;
     if (r.check_out) {
