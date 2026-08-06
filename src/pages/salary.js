@@ -8,7 +8,7 @@ import { calculateAllSalaries, formatCurrency } from '../utils/salary-calc.js';
 import { formatHoursShort, formatDate, formatTime, getDayName } from '../utils/time.js';
 import { renderNavbar, setupNavbar } from '../components/navbar.js';
 import { toast } from '../components/toast.js';
-import { exportToCSV } from '../utils/export.js';
+import { exportToCSV, exportToFormattedExcel } from '../utils/export.js';
 
 export default async function salaryPage(container) {
   // Auth check
@@ -466,56 +466,11 @@ export default async function salaryPage(container) {
       return;
     }
 
-    const headers = [
-      'STT',
-      'Nhân viên',
-      'Loại lương',
-      'Số ngày làm',
-      'Tổng giờ làm',
-      'Mức lương / Đơn giá',
-      'Thành tiền (Thực nhận)'
-    ];
-
-    const rows = data.map((item, index) => {
-      const stt = index + 1;
-      const empName = item.employee.name;
-      const typeName = item.typeName;
-      const days = item.type === 'monthly' ? item.actualDays : item.totalDays;
-      const hours = item.totalHours;
-      
-      const rateVal = item.type === 'hourly' ? item.rate : item.monthlyRate;
-      const rateUnit = item.type === 'hourly' ? 'đ/giờ' : 'đ/tháng';
-      const rateStr = `${Math.round(rateVal)} ${rateUnit}`;
-      const salaryVal = Math.round(item.salary);
-
-      return [
-        stt,
-        empName,
-        typeName,
-        days,
-        hours.toFixed(2),
-        rateStr,
-        salaryVal
-      ];
-    });
-
-    // Thêm dòng tổng cộng
-    const totalSalary = data.reduce((sum, d) => sum + (d.salary || 0), 0);
-    rows.push([
-      'Tổng cộng',
-      '',
-      '',
-      '',
-      '',
-      '',
-      Math.round(totalSalary)
-    ]);
-
-    const filename = `bang_luong_thang_${month}_${year}.csv`;
+    const filename = `bang_luong_thang_${month}_${year}.xls`;
 
     try {
-      exportToCSV(filename, headers, rows);
-      toast.success('Xuất file Excel bảng lương thành công! 🟢');
+      exportToFormattedExcel(filename, month, year, data);
+      toast.success('Xuất file Excel bảng lương đóng khung thành công! 🟢');
     } catch (err) {
       console.error('Lỗi xuất Excel bảng lương:', err);
       toast.error('Không thể xuất file: ' + err.message);
