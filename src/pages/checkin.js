@@ -577,7 +577,7 @@ async function showMonthHistoryModal(employeeId, employeeName) {
             <tbody>
               ${records.map(r => {
                 const hours = r.check_out ? (r.total_hours != null ? Number(r.total_hours) : calculateHours(r.check_in, r.check_out)) : null;
-                const hoursText = hours != null ? `${hours.toFixed(1)}h` : 'Đang làm';
+                const hoursText = hours != null ? formatHoursShort(hours) : 'Đang làm';
                 const deductionText = r.deducted_minutes > 0 ? `<br><small style="color:var(--danger); font-size: 0.7rem;">(trừ ${r.deducted_minutes}p)</small>` : '';
                 return `
                   <tr style="border-bottom: 1px solid var(--border-default);">
@@ -603,7 +603,7 @@ async function showMonthHistoryModal(employeeId, employeeName) {
           <div class="flex flex-between align-center p-3" style="background: rgba(255,255,255,0.03); border-radius: var(--border-radius-lg); border: 1px solid var(--border-default);">
             <div>
               <div style="font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">Tổng giờ tháng này</div>
-              <div style="font-size: 1.35rem; font-weight: 800; color: var(--accent-start); margin-top: 2px;">${totalHours.toFixed(1)} giờ</div>
+              <div style="font-size: 1.35rem; font-weight: 800; color: var(--accent-start); margin-top: 2px;">${formatHours(totalHours)}</div>
             </div>
             <div style="font-size: 1.8rem; opacity: 0.8;">⏱️</div>
           </div>
@@ -647,7 +647,7 @@ async function sendTelegramNotification(employeeName, isCheckIn, totalHours = nu
       text = `👋 <b>${employeeName}</b> vừa <b>CHECK-IN</b> lúc <b>${nowStr}</b> tại quán.`;
     } else {
       const hours = totalHours != null ? Number(totalHours) : 0;
-      const hoursText = `${hours.toFixed(1)} giờ`;
+      const hoursText = formatHours(hours);
       const deductionText = deductedMinutes > 0 ? ` (trừ ${deductedMinutes} phút nghỉ/ăn)` : '';
       text = `🚪 <b>${employeeName}</b> vừa <b>CHECK-OUT</b> lúc <b>${nowStr}</b>.\n⏱️ Tổng thời gian làm: <b>${hoursText}</b>${deductionText}`;
     }
