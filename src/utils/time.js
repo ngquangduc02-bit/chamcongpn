@@ -60,34 +60,32 @@ export function formatDate(date) {
  */
 export function formatHours(hours) {
   if (hours == null || isNaN(hours)) return '—';
-  const h = Math.floor(hours);
-  const m = Math.round((hours - h) * 60);
-  if (h === 0 && m === 0) return '0 phút';
-  if (h === 0) return `${m} phút`;
-  if (m === 0) return `${h} giờ`;
-  return `${h} giờ ${m} phút`;
+  const rounded = Math.round(hours * 100) / 100;
+  return `${rounded} giờ`;
 }
 
 /**
- * Format số giờ ngắn gọn
+ * Format số giờ ngắn gọn (dạng số thập phân thập phân chuẩn 2 chữ số)
  * @param {number} hours
- * @returns {string} VD: "8.5h"
+ * @returns {string} VD: "5.75h"
  */
 export function formatHoursShort(hours) {
   if (hours == null || isNaN(hours)) return '—';
-  return `${hours.toFixed(1)}h`;
+  const rounded = Math.round(hours * 100) / 100;
+  return `${rounded}h`;
 }
 
 /**
  * Tính số giờ giữa 2 thời điểm
  * @param {string|Date} start
  * @param {string|Date} end
- * @returns {number} Số giờ (VD: 8.5)
+ * @returns {number} Số giờ dạng thập phân chính xác (VD: 5.75)
  */
 export function calculateHours(start, end) {
   if (!start || !end) return 0;
   const diff = new Date(end) - new Date(start);
-  return diff / (1000 * 60 * 60);
+  const rawHours = diff / (1000 * 60 * 60);
+  return Math.round(rawHours * 100) / 100;
 }
 
 /**
