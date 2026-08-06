@@ -345,7 +345,11 @@ export default async function salaryPage(container) {
           .detail-table th { background: #fafafa; font-size: 10pt; }
           .detail-table td { font-size: 10pt; padding: 4px 8px; }
           .footer { text-align: right; margin-top: 30px; font-style: italic; color: #666; font-size: 10pt; }
-          @media print { body { padding: 10mm; } }
+          tfoot { display: table-row-group; }
+          @media print {
+            body { padding: 10mm; }
+            tfoot { display: table-row-group; }
+          }
         </style>
       </head>
       <body>
@@ -385,13 +389,11 @@ export default async function salaryPage(container) {
               </tr>
               ${renderPrintDailyDetail(item)}
             `).join('')}
-          </tbody>
-          <tfoot>
             <tr class="total-row">
-              <td colspan="6" class="text-right">Tổng cộng:</td>
-              <td class="text-right">${formatCurrency(totalSalary)}</td>
+              <td colspan="6" class="text-right"><strong>Tổng cộng:</strong></td>
+              <td class="text-right"><strong>${formatCurrency(totalSalary)}</strong></td>
             </tr>
-          </tfoot>
+          </tbody>
         </table>
 
         <p class="footer">Ngày in: ${new Date().toLocaleString('vi-VN')}</p>
