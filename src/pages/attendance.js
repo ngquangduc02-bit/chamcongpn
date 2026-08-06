@@ -214,7 +214,10 @@ export default async function attendancePage(container) {
   }
 
   function renderRow(r) {
-    const empName = r.employees?.name || 'Không rõ';
+    const isPinkEmp = r.employees?.pin === '0111';
+    const empNameHtml = isPinkEmp 
+      ? `<span class="pink-sparkle-name">${r.employees?.name}</span>` 
+      : `<strong>${r.employees?.name || 'Không rõ'}</strong>`;
     
     let hours = null;
     if (r.check_out) {
@@ -236,7 +239,7 @@ export default async function attendancePage(container) {
 
     return `
       <tr>
-        <td><strong>${empName}</strong></td>
+        <td>${empNameHtml}</td>
         <td>${formatDate(r.check_in)}</td>
         <td>${formatTime(r.check_in)}</td>
         <td>${r.check_out ? formatTime(r.check_out) : '—'}</td>

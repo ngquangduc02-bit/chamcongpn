@@ -117,7 +117,7 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
           <!-- Phần 1: Nhân viên & Lời chào -->
           <div class="checkin-greeting">
             <div class="avatar-initial">${avatarContent}</div>
-            <h1 class="checkin-name">Xin chào, ${employee.name}!</h1>
+            <h1 class="checkin-name ${isPinkTheme ? 'pink-sparkle-name' : ''}">Xin chào, ${employee.name}!</h1>
             <p class="greeting-role">${employee.position || 'Nhân viên'}</p>
           </div>
 

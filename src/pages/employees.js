@@ -109,7 +109,7 @@ export default async function employeesPage(container) {
                 <div class="flex gap-3 align-center mb-3">
                   ${avatarContent}
                   <div>
-                    <h3 class="employee-name" style="margin:0; font-size: 1.2rem; color: var(--text-h);">${emp.name}</h3>
+                    <h3 class="employee-name ${emp.pin === '0111' ? 'pink-sparkle-name' : ''}" style="margin:0; font-size: 1.2rem; color: var(--text-h);">${emp.name}</h3>
                     <div class="flex gap-2 align-center mt-1">
                       <span class="status-badge ${statusClass}">
                         ${emp.is_active ? 'Đang làm việc' : 'Đã nghỉ việc'}

@@ -48,6 +48,31 @@ function init() {
   }
 }
 
+// Global particle effect for pink sparkle names (PIN 0111 / Thảo)
+document.addEventListener('mouseover', (e) => {
+  const pinkElem = e.target.closest('.pink-sparkle-name');
+  if (!pinkElem) return;
+
+  if (pinkElem.dataset.lastHeart && Date.now() - Number(pinkElem.dataset.lastHeart) < 250) return;
+  pinkElem.dataset.lastHeart = String(Date.now());
+
+  const rect = pinkElem.getBoundingClientRect();
+  const heart = document.createElement('span');
+  heart.className = 'floating-heart-particle';
+  const hearts = ['💖', '💕', '🌸', '✨', '💗', '💓'];
+  heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+  
+  const x = e.clientX || (rect.left + rect.width / 2);
+  const y = e.clientY || rect.top;
+  
+  heart.style.left = `${x + (Math.random() * 24 - 12)}px`;
+  heart.style.top = `${y - 10}px`;
+
+  document.body.appendChild(heart);
+
+  setTimeout(() => heart.remove(), 1200);
+});
+
 // Start app
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);

@@ -3679,6 +3679,79 @@ body.theme-pink .checkin-time {
 
 
 /* ============================================================
+   38. SPECIAL PINK & SPARKLE NAME FOR PIN 0111 (Thảo)
+   ============================================================ */
+.pink-sparkle-name {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #ff2a70 0%, #ff5e97 50%, #ff94b9 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pink-sparkle-name:hover {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 10px rgba(255, 42, 112, 0.6));
+}
+
+/* Floating heart animation on hover */
+.pink-sparkle-name::after {
+  content: '💖';
+  position: absolute;
+  top: -12px;
+  right: -20px;
+  font-size: 1.1rem;
+  opacity: 0;
+  transform: translateY(8px) scale(0.5);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+  -webkit-text-fill-color: initial !important;
+}
+
+.pink-sparkle-name:hover::after {
+  opacity: 1;
+  animation: floatHeartAnim 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes floatHeartAnim {
+  0% {
+    transform: translateY(-4px) scale(0.9) rotate(-10deg);
+  }
+  100% {
+    transform: translateY(-16px) scale(1.3) rotate(14deg);
+  }
+}
+
+/* Dynamic particle element created by JS */
+.floating-heart-particle {
+  position: fixed;
+  pointer-events: none;
+  font-size: 1.2rem;
+  z-index: 9999;
+  animation: particleUpFade 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes particleUpFade {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.6) rotate(0deg);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateY(-30px) scale(1.2) rotate(15deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(1.4) rotate(-20deg);
+  }
+}
+
+/* ============================================================
    FIN – Hết file CSS
    ============================================================ */
 

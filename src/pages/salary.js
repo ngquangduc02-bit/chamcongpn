@@ -145,7 +145,7 @@ export default async function salaryPage(container) {
               ${data.map((item, index) => `
                 <tr class="salary-row" data-index="${index}">
                   <td>${index + 1}</td>
-                  <td><strong>${item.employee.name}</strong></td>
+                  <td>${item.employee.pin === '0111' ? `<span class="pink-sparkle-name">${item.employee.name}</span>` : `<strong>${item.employee.name}</strong>`}</td>
                   <td>
                     <span class="badge ${item.type === 'hourly' ? 'badge-info' : 'badge-success'}">
                       ${item.typeName}
