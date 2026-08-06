@@ -3752,6 +3752,15 @@ body.theme-pink .checkin-time {
   }
 }
 
+/* Mobile Optimization for Public Report Page Tables */
+@media (max-width: 640px) {
+  .report-table th, 
+  .report-table td {
+    padding: 6px 3px !important;
+    font-size: 0.72rem !important;
+  }
+}
+
 /* ============================================================
    FIN – Hết file CSS
    ============================================================ */

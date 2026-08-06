@@ -167,11 +167,10 @@ export function exportToFormattedExcel(filename, month, year, data) {
       <tr>
         <th class="sub-th" style="width: 50px;">STT</th>
         <th class="sub-th">Ngày Làm</th>
-        <th class="sub-th">Thứ</th>
         <th class="sub-th">Giờ Vào (Check-in)</th>
         <th class="sub-th">Giờ Ra (Check-out)</th>
         <th class="sub-th">Trừ Ăn/Nghỉ</th>
-        <th class="sub-th">Số Giờ Thực Làm</th>
+        <th class="sub-th" colspan="2">Số Giờ Thực Làm</th>
       </tr>
     `;
 
@@ -183,7 +182,6 @@ export function exportToFormattedExcel(filename, month, year, data) {
       recs.forEach((r) => {
         subIndex++;
         const dateFormatted = formatDate(r.check_in);
-        const dayName = getDayName(r.check_in);
         const inTime = formatTime(r.check_in);
         const outTime = r.check_out ? formatTime(r.check_out) : 'Chưa check-out';
         const deduction = r.deducted_minutes > 0 ? `${r.deducted_minutes} phút` : '0';
@@ -200,11 +198,10 @@ export function exportToFormattedExcel(filename, month, year, data) {
           <tr>
             <td class="text-center">${subIndex}</td>
             <td class="text-center">${dateFormatted}</td>
-            <td class="text-center">${dayName}</td>
             <td class="text-center">${inTime}</td>
             <td class="text-center">${outTime}</td>
             <td class="text-center">${deduction}</td>
-            <td class="text-right">${fmtHours(shiftHours)} giờ</td>
+            <td class="text-right" colspan="2">${fmtHours(shiftHours)} giờ</td>
           </tr>
         `;
       });
@@ -213,8 +210,8 @@ export function exportToFormattedExcel(filename, month, year, data) {
     // Dòng tổng kết cho nhân viên này
     html += `
       <tr class="emp-summary-row">
-        <td colspan="6" class="text-right"><b>TỔNG CỘNG TÍNH LƯƠNG CHO ${empName.toUpperCase()}:</b></td>
-        <td class="text-right" style="color: #1d4ed8;"><b>${fmtHours(empTotalHours)} giờ (${fmtNum(item.salary)} đ)</b></td>
+        <td colspan="5" class="text-right"><b>TỔNG CỘNG TÍNH LƯƠNG CHO ${empName.toUpperCase()}:</b></td>
+        <td class="text-right" colspan="2" style="color: #1d4ed8;"><b>${fmtHours(empTotalHours)} giờ (${fmtNum(item.salary)} đ)</b></td>
       </tr>
     `;
   });

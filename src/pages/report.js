@@ -199,13 +199,12 @@ export default async function reportPage(container) {
                   <table class="report-table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
                     <thead>
                       <tr style="background: rgba(255, 255, 255, 0.03);">
-                        <th style="padding: 8px; border: 1px solid var(--border-default); text-align: center; width: 35px;">STT</th>
-                        <th style="padding: 8px; border: 1px solid var(--border-default); text-align: center;">Ngày Làm</th>
-                        <th style="padding: 8px; border: 1px solid var(--border-default); text-align: center;">Thứ</th>
-                        <th style="padding: 8px; border: 1px solid var(--border-default); text-align: center;">Vào (Check-in)</th>
-                        <th style="padding: 8px; border: 1px solid var(--border-default); text-align: center;">Ra (Check-out)</th>
-                        <th style="padding: 8px; border: 1px solid var(--border-default); text-align: center;">Trừ Nghỉ</th>
-                        <th style="padding: 8px; border: 1px solid var(--border-default); text-align: right;">Giờ Thực Làm</th>
+                        <th style="padding: 8px 4px; border: 1px solid var(--border-default); text-align: center; width: 30px;">STT</th>
+                        <th style="padding: 8px 4px; border: 1px solid var(--border-default); text-align: center;">Ngày Làm</th>
+                        <th style="padding: 8px 4px; border: 1px solid var(--border-default); text-align: center;">Vào (In)</th>
+                        <th style="padding: 8px 4px; border: 1px solid var(--border-default); text-align: center;">Ra (Out)</th>
+                        <th style="padding: 8px 4px; border: 1px solid var(--border-default); text-align: center;">Trừ Nghỉ</th>
+                        <th style="padding: 8px 4px; border: 1px solid var(--border-default); text-align: right;">Thực Làm</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -214,9 +213,8 @@ export default async function reportPage(container) {
                         return recs.map((r) => {
                           subIndex++;
                           const dateFormatted = formatDate(r.check_in);
-                          const dayName = getDayName(r.check_in);
                           const inTime = formatTime(r.check_in);
-                          const outTime = r.check_out ? formatTime(r.check_out) : 'Chưa check-out';
+                          const outTime = r.check_out ? formatTime(r.check_out) : 'Chưa out';
                           const deduction = r.deducted_minutes > 0 ? `${r.deducted_minutes}p` : '0';
 
                           let shiftHours = 0;
@@ -229,22 +227,21 @@ export default async function reportPage(container) {
 
                           return `
                             <tr style="border-bottom: 1px solid var(--border-default);">
-                              <td style="padding: 6px; border: 1px solid var(--border-default); text-align: center;">${subIndex}</td>
-                              <td style="padding: 6px; border: 1px solid var(--border-default); text-align: center;">${dateFormatted}</td>
-                              <td style="padding: 6px; border: 1px solid var(--border-default); text-align: center;">${dayName}</td>
-                              <td style="padding: 6px; border: 1px solid var(--border-default); text-align: center;">${inTime}</td>
-                              <td style="padding: 6px; border: 1px solid var(--border-default); text-align: center;">${outTime}</td>
-                              <td style="padding: 6px; border: 1px solid var(--border-default); text-align: center;">${deduction}</td>
-                              <td style="padding: 6px; border: 1px solid var(--border-default); text-align: right;"><b>${formatHoursShort(shiftHours)}</b></td>
+                              <td style="padding: 6px 4px; border: 1px solid var(--border-default); text-align: center;">${subIndex}</td>
+                              <td style="padding: 6px 4px; border: 1px solid var(--border-default); text-align: center;">${dateFormatted}</td>
+                              <td style="padding: 6px 4px; border: 1px solid var(--border-default); text-align: center;">${inTime}</td>
+                              <td style="padding: 6px 4px; border: 1px solid var(--border-default); text-align: center;">${outTime}</td>
+                              <td style="padding: 6px 4px; border: 1px solid var(--border-default); text-align: center;">${deduction}</td>
+                              <td style="padding: 6px 4px; border: 1px solid var(--border-default); text-align: right;"><b>${formatHoursShort(shiftHours)}</b></td>
                             </tr>
                           `;
                         }).join('');
                       }).join('')}
                       <tr style="background: rgba(255, 255, 255, 0.04); font-weight: bold;">
-                        <td colspan="6" style="padding: 8px; border: 1px solid var(--border-default); text-align: right;">
+                        <td colspan="5" style="padding: 8px 4px; border: 1px solid var(--border-default); text-align: right;">
                           TỔNG CỘNG CHO ${empName.toUpperCase()}:
                         </td>
-                        <td style="padding: 8px; border: 1px solid var(--border-default); text-align: right; color: var(--primary);">
+                        <td style="padding: 8px 4px; border: 1px solid var(--border-default); text-align: right; color: var(--primary);">
                           <b>${formatHoursShort(empTotalHours)} (${formatCurrency(item.salary)})</b>
                         </td>
                       </tr>
