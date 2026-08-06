@@ -1735,7 +1735,7 @@ tbody td {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: var(--space-4); /* Giảm padding ngoài để card rộng hơn */
+  padding: var(--space-4) var(--space-3); /* Giảm padding viền ngoài để tăng khoảng rộng */
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -1749,18 +1749,19 @@ tbody td {
 
 .checkin-container {
   width: 100%;
-  max-width: 480px; /* Rộng hơn, gần full chiều ngang trên di động */
+  max-width: 420px; /* Chiều rộng vàng, vừa vặn hoàn hảo mọi điện thoại */
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4); /* Khoảng cách giữa các khung */
+  gap: var(--space-4);
+  box-sizing: border-box;
 }
 
 .checkin-card {
   background: #11111f !important; /* Khung xám sẫm tối giản */
   border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  border-radius: 16px !important;
-  padding: var(--space-6) var(--space-5) !important;
+  border-radius: 24px !important; /* Bo góc sâu hơn tạo vẻ hiện đại, cao cấp */
+  padding: var(--space-6) var(--space-4) !important; /* Tiết kiệm diện tích chiều ngang cho text */
   box-shadow: none !important;
   text-align: center;
   width: 100%;
@@ -1776,16 +1777,16 @@ tbody td {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 88px; /* Phóng to avatar lên 88px */
-  height: 88px;
+  width: 80px; /* Cỡ vàng 80px sắc nét */
+  height: 80px;
   border-radius: var(--border-radius-full);
   background: var(--accent-gradient);
   color: #ffffff;
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   margin: 0 auto var(--space-3) auto;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.08);
   transition: transform var(--transition-base);
 }
 .checkin-page .avatar-initial:hover {
@@ -1793,39 +1794,41 @@ tbody td {
 }
 
 .checkin-greeting {
-  font-size: var(--font-size-lg);
-  color: var(--text-secondary);
-  margin-bottom: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-1);
 }
 
 .checkin-name {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
   color: #ffffff;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-4);
 }
 
 .checkin-time {
-  font-size: 3.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: -0.05em;
+  font-size: 2.8rem; /* Giảm nhẹ size để chống vỡ hàng trên di động */
+  font-weight: 800;
+  letter-spacing: -0.02em;
   margin-bottom: var(--space-1);
   font-variant-numeric: tabular-nums;
-  font-family: monospace, var(--font-family); /* Hiển thị đồng hồ monospace rõ ràng */
+  font-family: var(--font-family);
+  background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .checkin-date {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   color: var(--text-muted);
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-2);
 }
 
-/* Nút chấm công tối giản sạch sẽ */
+/* Nút chấm công tròn phẳng, đổ bóng dải màu mượt */
 .checkin-btn {
   position: relative;
-  width: 140px;
-  height: 140px;
+  width: 130px;
+  height: 130px;
   border-radius: var(--border-radius-full);
   border: none;
   font-family: var(--font-family);
@@ -1838,13 +1841,13 @@ tbody td {
 }
 
 .checkin-btn--in {
-  background: var(--success);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
 }
 
 .checkin-btn--out {
-  background: var(--danger);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25);
 }
 
 .checkin-btn:hover {
@@ -1857,15 +1860,93 @@ tbody td {
 
 .checkin-btn-icon {
   display: block;
-  font-size: 2.5rem;
-  margin-bottom: var(--space-2);
+  font-size: 2.2rem;
+  margin-bottom: var(--space-1);
 }
 
-.checkin-btn-text {
+.checkin-btn-label {
   display: block;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
+}
+
+/* Định vị dạng viên thuốc (Pill Badge) */
+.location-status {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 20px !important;
+  font-size: var(--font-size-xs) !important;
+  color: var(--text-tertiary) !important;
+  margin: 0 auto;
+}
+
+/* Thiết kế bảng số liệu dạng widget con sang trọng */
+.checkin-page .summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: var(--space-4);
+}
+
+.checkin-page .summary-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: var(--space-3) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.checkin-page .summary-value {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.checkin-page .summary-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.checkin-page .summary-history {
+  margin-top: var(--space-4);
+  text-align: left;
+}
+
+.checkin-page .history-title {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+  text-align: center;
+}
+
+.checkin-page .history-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: var(--font-size-sm);
+}
+
+.checkin-page .history-time {
+  color: var(--text-secondary);
+}
+
+.checkin-page .history-hours {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
 }
 
 /* Trạng thái đã chấm công */
@@ -3539,6 +3620,31 @@ body.theme-pink .navbar-link.active {
 
 body.theme-pink .checkin-divider {
   border-top: 1px solid #ffd5dd !important;
+}
+
+body.theme-pink .checkin-page .summary-item {
+  background: rgba(255, 117, 143, 0.03) !important;
+  border: 1px solid rgba(255, 117, 143, 0.12) !important;
+}
+body.theme-pink .checkin-page .summary-value {
+  color: #4b1620 !important;
+}
+body.theme-pink .checkin-page .history-row {
+  background: rgba(255, 117, 143, 0.02) !important;
+  border: 1px solid rgba(255, 117, 143, 0.08) !important;
+}
+body.theme-pink .checkin-page .history-hours {
+  color: #4b1620 !important;
+}
+body.theme-pink .location-status {
+  background: rgba(255, 117, 143, 0.05) !important;
+  border: 1px solid rgba(255, 117, 143, 0.15) !important;
+  color: #702632 !important;
+}
+body.theme-pink .checkin-time {
+  background: linear-gradient(180deg, #4b1620 0%, #702632 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 
