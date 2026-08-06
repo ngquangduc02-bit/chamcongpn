@@ -13,6 +13,7 @@ import employeesPage from './pages/employees.js';
 import attendancePage from './pages/attendance.js';
 import salaryPage from './pages/salary.js';
 import settingsPage from './pages/settings.js';
+import reportPage from './pages/report.js';
 
 // Register routes
 registerRoute('/checkin', checkinPage);
@@ -22,6 +23,7 @@ registerRoute('/employees', employeesPage);
 registerRoute('/attendance', attendancePage);
 registerRoute('/salary', salaryPage);
 registerRoute('/settings', settingsPage);
+registerRoute('/report', reportPage);
 
 // Hide loading screen and start router
 function init() {

@@ -3275,7 +3275,8 @@ tbody td {
   .navbar,
   .toast-container,
   .btn,
-  .sidebar-overlay {
+  .sidebar-overlay,
+  .no-print {
     display: none !important;
   }
 

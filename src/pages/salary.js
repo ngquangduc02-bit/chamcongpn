@@ -118,6 +118,9 @@ export default async function salaryPage(container) {
         <div class="flex-between mb-2" style="flex-wrap: wrap; gap: 0.5rem;">
           <h2 style="margin: 0;">Bảng lương Tháng ${month}/${year}</h2>
           <div class="flex gap-1">
+            <button class="btn btn-outline" id="btn-share-report" style="color: var(--accent); border-color: var(--border-default);">
+              🔗 Lấy Link Báo Cáo
+            </button>
             <button class="btn btn-outline" id="btn-print">
               🖨️ In báo cáo
             </button>
@@ -224,6 +227,13 @@ export default async function salaryPage(container) {
         detailRow.classList.toggle('hidden');
         btn.textContent = isHidden ? '▲' : '▼';
       });
+    });
+
+    // Share report handler
+    document.getElementById('btn-share-report').addEventListener('click', () => {
+      const fullUrl = `${window.location.origin}/#/report?month=${month}&year=${year}`;
+      navigator.clipboard.writeText(fullUrl);
+      toast.success('Đã copy đường dẫn Báo Cáo Tháng vào bộ nhớ tạm! Bạn có thể gửi link này cho mọi người. 📋');
     });
 
     // Print handler

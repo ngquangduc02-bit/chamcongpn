@@ -15,7 +15,14 @@ export function navigate(path) {
 }
 
 export function getCurrentRoute() {
-  return window.location.hash.slice(1) || '/checkin';
+  const fullHash = window.location.hash.slice(1) || '/checkin';
+  return fullHash.split('?')[0];
+}
+
+export function getQueryParams() {
+  const fullHash = window.location.hash.slice(1) || '';
+  const queryString = fullHash.split('?')[1] || '';
+  return new URLSearchParams(queryString);
 }
 
 export function initRouter(containerId = 'app') {
