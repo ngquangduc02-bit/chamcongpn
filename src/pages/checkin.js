@@ -248,8 +248,8 @@ export default async function checkinPage(container) {
   try {
     const device = await getDeviceByToken(deviceToken);
 
-    if (!device) {
-      // Token invalid / deactivated
+    if (!device || !device.employees) {
+      // Token invalid / deactivated or employee deleted
       localStorage.removeItem(DEVICE_TOKEN_KEY);
       toast.warning('Thiết bị đã bị hủy liên kết. Vui lòng đăng ký lại.');
       await showRegistration(container);

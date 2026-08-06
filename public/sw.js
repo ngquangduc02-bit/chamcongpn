@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chamcong-v1';
+const CACHE_NAME = 'chamcong-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -10,17 +10,17 @@ const ASSETS = [
   '/apple-touch-icon.png'
 ];
 
-// Install: lưu trữ sẵn các file tĩnh cơ bản
+// Install: lưu trữ các asset tĩnh cơ bản
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+      return cache.addAll(ASSETS).catch(() => {});
     })
   );
   self.skipWaiting();
 });
 
-// Activate: dọn dẹp các cache cũ khác
+// Activate: tự động xóa toàn bộ các bản cache cũ (v1) ngay lập tức
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
@@ -36,47 +36,50 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Fetch: cơ chế Stale-While-Revalidate (lấy từ cache trước, cập nhật từ mạng sau)
+// Fetch handling
 self.addEventListener('fetch', (e) => {
-  // Chỉ xử lý các yêu cầu GET
   if (e.request.method !== 'GET') return;
 
   const url = new URL(e.request.url);
 
-  // Không cache các yêu cầu API đến Supabase hoặc Telegram Webhook
+  // Không can thiệp API Supabase & Telegram Webhook
   if (url.origin.includes('supabase.co') || url.pathname.includes('/api/')) {
     return;
   }
 
+  // Đối với điều hướng HTML (trang web chính): luôn lấy từ Network trước để luôn nhận file JS/CSS chứa hash mới nhất từ Vercel!
+  if (e.request.mode === 'navigate' || e.request.headers.get('accept')?.includes('text/html')) {
+    e.respondWith(
+      fetch(e.request)
+        .then((networkResponse) => {
+          if (networkResponse.status === 200) {
+            const copy = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copy));
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // Khi ngoại tuyến (không có mạng), dùng bản cache index.html
+          return caches.match('/index.html') || caches.match('/');
+        })
+    );
+    return;
+  }
+
+  // Đổi với asset (ảnh, icon, font): lấy từ cache trước, cập nhật mạng ngầm
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Nếu có trong cache, trả về trước và tải ngầm bản mới từ mạng để cập nhật cache
         fetch(e.request)
           .then((networkResponse) => {
             if (networkResponse.status === 200) {
               caches.open(CACHE_NAME).then((cache) => cache.put(e.request, networkResponse));
             }
           })
-          .catch(() => {}); // Bỏ qua lỗi kết nối ngầm
+          .catch(() => {});
         return cachedResponse;
       }
-
-      // Nếu không có trong cache, tải từ mạng
-      return fetch(e.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(e.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      }).catch(() => {
-        // Nếu mất mạng và là trang điều hướng, trả về trang chính
-        if (e.request.mode === 'navigate') {
-          return caches.match('/');
-        }
-      });
+      return fetch(e.request);
     })
   );
 });
