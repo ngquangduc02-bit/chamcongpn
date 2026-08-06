@@ -69,10 +69,6 @@ function renderRegistrationPage() {
             </button>
           </form>
         </div>
-
-        <div class="checkin-footer">
-          <a href="#/admin" class="admin-link">Quản lý →</a>
-        </div>
       </div>
     </div>
   `;
@@ -200,11 +196,6 @@ function renderCheckinPage(employee, activeAttendance, todayRecords) {
           <button class="btn btn-outline btn-block" id="view-history-btn">
             ${historyIcon} Xem lịch sử tháng này
           </button>
-        </div>
-
-        <!-- Footer -->
-        <div class="checkin-footer" style="margin-top: 8px;">
-          <a href="#/admin" class="admin-link">Quản lý →</a>
         </div>
 
       </div>
