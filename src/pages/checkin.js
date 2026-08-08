@@ -555,13 +555,25 @@ async function showRegistration(container) {
 async function showMonthHistoryModal(employeeId, employeeName) {
   toast.info('Đang tải lịch sử...');
   try {
-    const { start, end } = getCurrentMonthRange();
-    const records = await getAttendanceByDate(start, end, employeeId);
-    
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0).toISOString();
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).toISOString();
+
+    let records = [];
+    try {
+      records = (await getAttendanceByDate(start, end, employeeId)) || [];
+    } catch (queryErr) {
+      console.warn('Lỗi lấy attendance theo ngày:', queryErr);
+      records = [];
+    }
+
     let totalHours = 0;
     records.forEach(r => {
       if (r.check_out) {
-        totalHours += r.total_hours != null ? Number(r.total_hours) : calculateHours(r.check_in, r.check_out);
+        const raw = calculateHours(r.check_in, r.check_out);
+        const deductVal = (r.deducted_minutes || 0) / 60;
+        const shiftHours = Math.max(0, raw - deductVal);
+        totalHours += shiftHours;
       }
     });
 
@@ -576,8 +588,13 @@ async function showMonthHistoryModal(employeeId, employeeName) {
             </thead>
             <tbody>
               ${records.map(r => {
-                const hours = r.check_out ? (r.total_hours != null ? Number(r.total_hours) : calculateHours(r.check_in, r.check_out)) : null;
-                const hoursText = hours != null ? formatHoursShort(hours) : 'Đang làm';
+                let shiftHours = 0;
+                if (r.check_out) {
+                  const raw = calculateHours(r.check_in, r.check_out);
+                  const deductVal = (r.deducted_minutes || 0) / 60;
+                  shiftHours = Math.max(0, raw - deductVal);
+                }
+                const hoursText = r.check_out ? `${shiftHours.toFixed(2)}h` : 'Đang làm';
                 const deductionText = r.deducted_minutes > 0 ? `<br><small style="color:var(--danger); font-size: 0.7rem;">(trừ ${r.deducted_minutes}p)</small>` : '';
                 return `
                   <tr style="border-bottom: 1px solid var(--border-default);">
@@ -602,8 +619,8 @@ async function showMonthHistoryModal(employeeId, employeeName) {
         <div style="margin-bottom: 15px;">
           <div class="flex flex-between align-center p-3" style="background: rgba(255,255,255,0.03); border-radius: var(--border-radius-lg); border: 1px solid var(--border-default);">
             <div>
-              <div style="font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">Tổng giờ tháng này</div>
-              <div style="font-size: 1.35rem; font-weight: 800; color: var(--accent-start); margin-top: 2px;">${formatHours(totalHours)}</div>
+              <div style="font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">Tổng giờ tháng ${now.getMonth() + 1}</div>
+              <div style="font-size: 1.35rem; font-weight: 800; color: var(--accent-start); margin-top: 2px;">${totalHours.toFixed(2)}h</div>
             </div>
             <div style="font-size: 1.8rem; opacity: 0.8;">⏱️</div>
           </div>

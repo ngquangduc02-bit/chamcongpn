@@ -201,7 +201,7 @@ export async function getAttendanceByDate(startDate, endDate, employeeId = null)
 
   const { data, error } = await query;
   if (error) throw error;
-  return data;
+  return data || [];
 }
 
 export async function getTodayAttendance() {
