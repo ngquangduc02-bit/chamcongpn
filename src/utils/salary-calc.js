@@ -86,10 +86,20 @@ export function calculateSalary(employee, attendanceRecords) {
  * @returns {Array} Kết quả tính lương cho từng nhân viên
  */
 export function calculateAllSalaries(employees, allAttendance) {
-  return employees.map((emp) => {
+  const result = employees.map((emp) => {
     const empRecords = allAttendance.filter((a) => a.employee_id === emp.id);
     return calculateSalary(emp, empRecords);
   });
+
+  result.sort((a, b) => {
+    const pinA = a.employee?.pin;
+    const pinB = b.employee?.pin;
+    if (pinA === '0111' && pinB !== '0111') return -1;
+    if (pinA !== '0111' && pinB === '0111') return 1;
+    return 0;
+  });
+
+  return result;
 }
 
 /**

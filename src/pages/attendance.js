@@ -176,6 +176,19 @@ export default async function attendancePage(container) {
       return;
     }
 
+    // Sort PIN 0111 / Thảo records first
+    const sortedRecords = [...records].sort((a, b) => {
+      const pinA = a.employees?.pin;
+      const pinB = b.employees?.pin;
+      const nameA = a.employees?.name || '';
+      const nameB = b.employees?.name || '';
+      const isPinA = pinA === '0111' || nameA.includes('Thảo');
+      const isPinB = pinB === '0111' || nameB.includes('Thảo');
+      if (isPinA && !isPinB) return -1;
+      if (!isPinA && isPinB) return 1;
+      return 0;
+    });
+
     tableWrapper.innerHTML = `
       <table>
         <thead>
@@ -191,7 +204,7 @@ export default async function attendancePage(container) {
           </tr>
         </thead>
         <tbody>
-          ${records.map((r) => renderRow(r)).join('')}
+          ${sortedRecords.map((r) => renderRow(r)).join('')}
         </tbody>
       </table>
     `;

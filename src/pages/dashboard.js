@@ -105,6 +105,18 @@ export default async function dashboard(container) {
       return;
     }
 
+    const sortedRecords = [...records].sort((a, b) => {
+      const pinA = a.employees?.pin;
+      const pinB = b.employees?.pin;
+      const nameA = a.employees?.name || '';
+      const nameB = b.employees?.name || '';
+      const isPinA = pinA === '0111' || nameA.includes('Thảo');
+      const isPinB = pinB === '0111' || nameB.includes('Thảo');
+      if (isPinA && !isPinB) return -1;
+      if (!isPinA && isPinB) return 1;
+      return 0;
+    });
+
     wrap.innerHTML = `
       <div class="table-container">
         <table>
@@ -117,7 +129,7 @@ export default async function dashboard(container) {
             </tr>
           </thead>
           <tbody>
-            ${records.map(r => {
+            ${sortedRecords.map(r => {
               const hours = r.check_out
                 ? calculateHours(r.check_in, r.check_out)
                 : calculateHours(r.check_in, new Date().toISOString());

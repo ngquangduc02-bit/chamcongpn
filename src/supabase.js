@@ -23,6 +23,14 @@ export async function getEmployees(activeOnly = true) {
   if (activeOnly) query = query.eq('is_active', true);
   const { data, error } = await query;
   if (error) throw error;
+  
+  if (data && Array.isArray(data)) {
+    data.sort((a, b) => {
+      if (a.pin === '0111' && b.pin !== '0111') return -1;
+      if (a.pin !== '0111' && b.pin === '0111') return 1;
+      return (a.name || '').localeCompare(b.name || '', 'vi');
+    });
+  }
   return data;
 }
 
