@@ -186,11 +186,16 @@ export default async function settingsPage(container) {
                   </thead>
                   <tbody>
                     ${devices && devices.length > 0
-                      ? devices.map(dev => `
+                      ? devices.map(dev => {
+                          const infoTitle = typeof dev.device_info === 'object' && dev.device_info ? JSON.stringify(dev.device_info) : (dev.device_info || '');
+                          const infoDisplay = typeof dev.device_info === 'object' && dev.device_info 
+                            ? (dev.device_info.summary || dev.device_info.userAgent || 'Thiết bị') 
+                            : (dev.device_info || 'Không rõ');
+                          return `
                           <tr>
                             <td class="font-semibold">${dev.employees?.name || 'Đã xóa'}</td>
                             <td><code style="font-size:0.8rem; color: var(--text-secondary);">${dev.device_token.slice(0, 8)}...${dev.device_token.slice(-8)}</code></td>
-                            <td style="max-width: 200px;" class="truncate" title="${dev.device_info || ''}">${dev.device_info || 'Không rõ'}</td>
+                            <td style="max-width: 200px;" class="truncate" title="${infoTitle}">${infoDisplay}</td>
                             <td>${formatDateTime(dev.registered_at)}</td>
                             <td>
                               <span class="status-badge ${dev.is_active ? 'status-active' : 'status-inactive'}">
@@ -204,7 +209,8 @@ export default async function settingsPage(container) {
                               }
                             </td>
                           </tr>
-                        `).join('')
+                        `;
+                        }).join('')
                       : '<tr><td colspan="6" class="text-center text-muted">Chưa có thiết bị nào được liên kết.</td></tr>'
                     }
                   </tbody>

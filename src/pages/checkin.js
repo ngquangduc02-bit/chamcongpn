@@ -13,6 +13,7 @@ import {
   getAttendanceByDate,
   getSettings,
   getDevicesByEmployee,
+  deactivateDevice,
 } from '../supabase.js';
 import { navigate } from '../utils/router.js';
 import { getCurrentPosition, getIPInfo, verifyLocation, verifyIP } from '../utils/location.js';
@@ -481,6 +482,7 @@ async function showRegistration(container) {
     e.preventDefault();
 
     const employeeId = select.value;
+    const employeeName = select.options[select.selectedIndex]?.text || 'Nhân viên';
     const pin = document.getElementById('pin-input').value.trim();
 
     if (!employeeId) {
@@ -510,19 +512,26 @@ async function showRegistration(container) {
         return;
       }
 
-      // Kiểm tra xem nhân viên đã có thiết bị nào đang hoạt động chưa
+      // Kiểm tra xem nhân viên đã có thiết bị nào đang hoạt động trước đó chưa
       const devices = await getDevicesByEmployee(employeeId);
-      const activeDevice = devices.find((d) => d.is_active === true);
-      if (activeDevice) {
-        toast.error('Nhân viên này đã được liên kết với một thiết bị khác! Vui lòng liên hệ Admin để hủy liên kết thiết bị cũ trước.');
-        return;
+      const activeDevices = (devices || []).filter((d) => d.is_active === true);
+      const hadPreviousDevice = activeDevices.length > 0;
+
+      // Nếu đã có thiết bị cũ -> Tự động hủy liên kết thiết bị cũ
+      if (hadPreviousDevice) {
+        for (const dev of activeDevices) {
+          await deactivateDevice(dev.id);
+        }
       }
+
+      const deviceSummary = getDeviceSummary();
 
       // Generate token & register
       const token = crypto.randomUUID();
       const deviceInfo = {
         userAgent: navigator.userAgent,
         platform: navigator.platform || 'unknown',
+        summary: deviceSummary,
         registeredAt: new Date().toISOString(),
       };
 
@@ -531,7 +540,13 @@ async function showRegistration(container) {
       // Save to localStorage
       localStorage.setItem(DEVICE_TOKEN_KEY, token);
 
-      toast.success('Đăng ký thiết bị thành công! 🎉');
+      if (hadPreviousDevice) {
+        toast.success('Đã liên kết thiết bị mới thành công! (Thiết bị cũ đã được tự động gỡ)');
+        // Gửi thông báo cảnh báo về nhóm Telegram của quản lý
+        sendTelegramDeviceAlert(employeeName, deviceSummary);
+      } else {
+        toast.success('Đăng ký thiết bị thành công! 🎉');
+      }
 
       // Reload into main checkin view
       setTimeout(() => {
@@ -680,5 +695,72 @@ async function sendTelegramNotification(employeeName, isCheckIn, totalHours = nu
     });
   } catch (err) {
     console.error('Lỗi gửi thông báo Telegram:', err);
+  }
+}
+
+// ============================================================
+// Helper to detect human-readable device summary
+// ============================================================
+function getDeviceSummary() {
+  const ua = navigator.userAgent || '';
+  let os = 'Thiết bị';
+  if (/iPhone/i.test(ua)) os = 'iPhone';
+  else if (/iPad/i.test(ua)) os = 'iPad';
+  else if (/Android/i.test(ua)) os = 'Android';
+  else if (/Windows/i.test(ua)) os = 'Windows PC';
+  else if (/Macintosh/i.test(ua)) os = 'Mac';
+
+  let browser = 'Trình duyệt';
+  if (/Zalo/i.test(ua)) browser = 'Zalo App';
+  else if (/FBAN|FBAV/i.test(ua)) browser = 'Facebook App';
+  else if (/Edg/i.test(ua)) browser = 'Edge';
+  else if (/Chrome/i.test(ua)) browser = 'Chrome';
+  else if (/Safari/i.test(ua)) browser = 'Safari';
+
+  return `${os} (${browser})`;
+}
+
+// ============================================================
+// Send Telegram alert when employee links a new/replacement device
+// ============================================================
+async function sendTelegramDeviceAlert(employeeName, deviceSummary) {
+  try {
+    const settings = await getSettings();
+    const botToken = settings?.telegram_bot_token;
+    const groupChatId = settings?.telegram_group_chat_id;
+
+    if (!botToken || !groupChatId) return;
+
+    const now = new Date();
+    const nowStr = now.toLocaleTimeString('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZone: 'Asia/Ho_Chi_Minh',
+    });
+    const dateStr = now.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      timeZone: 'Asia/Ho_Chi_Minh',
+    });
+
+    const text = `⚠️ <b>CẢNH BÁO ĐỔI THIẾT BỊ</b>\n` +
+                 `👤 Nhân viên: <b>${employeeName}</b>\n` +
+                 `📱 Thiết bị mới: <b>${deviceSummary}</b>\n` +
+                 `⏰ Thời gian: <b>${nowStr} - ${dateStr}</b>\n` +
+                 `ℹ️ <i>Thiết bị cũ đã được tự động gỡ liên kết.</i>`;
+
+    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: groupChatId,
+        text: text,
+        parse_mode: 'HTML',
+      }),
+    });
+  } catch (err) {
+    console.error('Lỗi gửi cảnh báo đổi thiết bị qua Telegram:', err);
   }
 }
