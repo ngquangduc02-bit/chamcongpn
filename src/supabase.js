@@ -113,6 +113,7 @@ export async function getAllDevices() {
   const { data, error } = await supabase
     .from('device_tokens')
     .select('*, employees(name)')
+    .eq('is_active', true)
     .order('registered_at', { ascending: false });
   if (error) throw error;
   return data;
