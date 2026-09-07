@@ -2,7 +2,7 @@
 // Time Utilities - Xử lý thời gian cho Việt Nam (UTC+7)
 // ============================================================
 
-const VN_TIMEZONE = 'Asia/Ho_Chi_Minh';
+export const VN_TIMEZONE = 'Asia/Ho_Chi_Minh';
 
 /**
  * Format ngày giờ theo kiểu Việt Nam
@@ -12,6 +12,7 @@ const VN_TIMEZONE = 'Asia/Ho_Chi_Minh';
 export function formatDateTime(date) {
   if (!date) return '—';
   const d = new Date(date);
+  if (isNaN(d.getTime())) return '—';
   return d.toLocaleString('vi-VN', {
     timeZone: VN_TIMEZONE,
     day: '2-digit',
@@ -30,6 +31,7 @@ export function formatDateTime(date) {
 export function formatTime(date) {
   if (!date) return '—';
   const d = new Date(date);
+  if (isNaN(d.getTime())) return '—';
   return d.toLocaleString('vi-VN', {
     timeZone: VN_TIMEZONE,
     hour: '2-digit',
@@ -44,7 +46,12 @@ export function formatTime(date) {
  */
 export function formatDate(date) {
   if (!date) return '—';
+  if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const [y, m, d] = date.split('-');
+    return `${d}/${m}/${y}`;
+  }
   const d = new Date(date);
+  if (isNaN(d.getTime())) return '—';
   return d.toLocaleString('vi-VN', {
     timeZone: VN_TIMEZONE,
     day: '2-digit',
@@ -54,9 +61,26 @@ export function formatDate(date) {
 }
 
 /**
+ * Lấy chuỗi ngày YYYY-MM-DD theo đúng múi giờ Việt Nam
+ * @param {string|Date} date
+ * @returns {string} VD: "2026-09-02"
+ */
+export function getVNDateString(date) {
+  if (!date) return '';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: VN_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(d);
+}
+
+/**
  * Format số giờ làm việc
  * @param {number} hours - Số giờ (VD: 8.5)
- * @returns {string} VD: "8 giờ 30 phút"
+ * @returns {string} VD: "8.5 giờ"
  */
 export function formatHours(hours) {
   if (hours == null || isNaN(hours)) return '—';
@@ -65,7 +89,7 @@ export function formatHours(hours) {
 }
 
 /**
- * Format số giờ ngắn gọn (dạng số thập phân thập phân chuẩn 2 chữ số)
+ * Format số giờ ngắn gọn (dạng số thập phân chuẩn 2 chữ số)
  * @param {number} hours
  * @returns {string} VD: "5.75h"
  */
@@ -91,7 +115,7 @@ export function calculateHours(start, end) {
 /**
  * Tính thời gian đã trôi qua từ lúc check-in đến hiện tại
  * @param {string|Date} checkInTime
- * @returns {string} VD: "3 giờ 25 phút"
+ * @returns {string} VD: "3.5 giờ"
  */
 export function getElapsedTime(checkInTime) {
   if (!checkInTime) return '—';
@@ -100,72 +124,108 @@ export function getElapsedTime(checkInTime) {
 }
 
 /**
- * Lấy ngày bắt đầu và kết thúc của ngày hôm nay (UTC+7)
+ * Lấy khoảng thời gian của ngày hôm nay theo múi giờ Việt Nam (UTC+7)
  */
 export function getTodayRange() {
-  const now = new Date();
-  // Adjust for Vietnam timezone
-  const vnNow = new Date(now.toLocaleString('en-US', { timeZone: VN_TIMEZONE }));
-  const start = new Date(vnNow);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(vnNow);
-  end.setHours(23, 59, 59, 999);
-  return { start: start.toISOString(), end: end.toISOString() };
+  const vnDateStr = getVNDateString(new Date());
+  return {
+    start: `${vnDateStr}T00:00:00+07:00`,
+    end: `${vnDateStr}T23:59:59.999+07:00`,
+  };
 }
 
 /**
- * Lấy ngày bắt đầu và kết thúc của tháng hiện tại
+ * Lấy khoảng thời gian của một tháng theo múi giờ Việt Nam (UTC+7)
+ * @param {number} year 
+ * @param {number} month (1 - 12)
+ */
+export function getMonthRange(year, month) {
+  const m = String(month).padStart(2, '0');
+  const lastDay = new Date(year, month, 0).getDate();
+  const lastDayStr = String(lastDay).padStart(2, '0');
+  return {
+    start: `${year}-${m}-01T00:00:00+07:00`,
+    end: `${year}-${m}-${lastDayStr}T23:59:59.999+07:00`,
+  };
+}
+
+/**
+ * Lấy khoảng thời gian của tháng hiện tại theo múi giờ Việt Nam (UTC+7)
  */
 export function getCurrentMonthRange() {
-  const now = new Date();
-  const vnNow = new Date(now.toLocaleString('en-US', { timeZone: VN_TIMEZONE }));
-  const start = new Date(vnNow.getFullYear(), vnNow.getMonth(), 1);
-  const end = new Date(vnNow.getFullYear(), vnNow.getMonth() + 1, 0, 23, 59, 59, 999);
-  return { start: start.toISOString(), end: end.toISOString() };
+  const vnDateStr = getVNDateString(new Date());
+  const [y, m] = vnDateStr.split('-').map(Number);
+  return getMonthRange(y, m);
 }
 
 /**
- * Lấy ngày bắt đầu và kết thúc của tuần hiện tại (Thứ 2 - CN)
+ * Lấy ngày bắt đầu và kết thúc của tuần hiện tại (Thứ 2 - CN) theo múi giờ Việt Nam
  */
 export function getCurrentWeekRange() {
-  const now = new Date();
-  const vnNow = new Date(now.toLocaleString('en-US', { timeZone: VN_TIMEZONE }));
-  const dayOfWeek = vnNow.getDay(); // 0 = CN
+  const vnDateStr = getVNDateString(new Date());
+  const [y, m, d] = vnDateStr.split('-').map(Number);
+  const vnDate = new Date(y, m - 1, d);
+  const dayOfWeek = vnDate.getDay(); // 0 = CN
   const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  const start = new Date(vnNow);
-  start.setDate(vnNow.getDate() - diffToMonday);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
-  end.setHours(23, 59, 59, 999);
-  return { start: start.toISOString(), end: end.toISOString() };
+
+  const monday = new Date(y, m - 1, d - diffToMonday);
+  const sunday = new Date(y, m - 1, d - diffToMonday + 6);
+
+  const monStr = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
+  const sunStr = `${sunday.getFullYear()}-${String(sunday.getMonth() + 1).padStart(2, '0')}-${String(sunday.getDate()).padStart(2, '0')}`;
+
+  return {
+    start: `${monStr}T00:00:00+07:00`,
+    end: `${sunStr}T23:59:59.999+07:00`,
+  };
 }
 
 /**
- * Format ngày cho input[type="date"]
+ * Format ngày cho input[type="date"] theo múi giờ Việt Nam
  */
 export function toInputDate(date) {
-  const d = new Date(date);
-  return d.toISOString().split('T')[0];
+  return getVNDateString(date);
 }
 
 /**
- * Format ngày cho input[type="datetime-local"]
+ * Format ngày giờ cho input[type="datetime-local"] theo múi giờ Việt Nam
  */
 export function toInputDatetime(date) {
   if (!date) return '';
   const d = new Date(date);
-  const offset = d.getTimezoneOffset();
-  const local = new Date(d.getTime() - offset * 60000);
-  return local.toISOString().slice(0, 16);
+  if (isNaN(d.getTime())) return '';
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: VN_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(d);
+  const p = {};
+  parts.forEach(({ type, value }) => { p[type] = value; });
+  const hour = p.hour === '24' ? '00' : p.hour;
+  return `${p.year}-${p.month}-${p.day}T${hour}:${p.minute}`;
 }
 
 /**
- * Lấy tên thứ trong tuần
+ * Lấy tên thứ trong tuần theo múi giờ Việt Nam
  */
 export function getDayName(date) {
+  if (!date) return '';
   const days = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
-  return days[new Date(date).getDay()];
+  if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const [y, m, d] = date.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    return days[dt.getDay()];
+  }
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+  const vnDay = new Intl.DateTimeFormat('en-US', { timeZone: VN_TIMEZONE, weekday: 'short' }).format(d);
+  const map = { 'Sun': 0, 'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6 };
+  return days[map[vnDay] ?? d.getDay()];
 }
 
 /**

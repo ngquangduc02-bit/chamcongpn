@@ -2,6 +2,8 @@
 // Salary Calculator - Tính lương nhân viên
 // ============================================================
 
+import { getVNDateString } from './time.js';
+
 /**
  * Tính lương cho 1 nhân viên trong khoảng thời gian
  * @param {Object} employee - Thông tin nhân viên
@@ -29,8 +31,8 @@ export function calculateSalary(employee, attendanceRecords) {
       
       totalHours += hours;
 
-      // Nhóm theo ngày
-      const day = new Date(record.check_in).toISOString().split('T')[0];
+      // Nhóm theo ngày theo đúng múi giờ Việt Nam
+      const day = getVNDateString(record.check_in);
       if (!dailyHours[day]) {
         dailyHours[day] = 0;
         totalDays++;

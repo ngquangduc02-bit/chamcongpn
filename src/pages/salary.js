@@ -5,7 +5,7 @@
 import { isAdminLoggedIn, getEmployees, getAttendanceByDate } from '../supabase.js';
 import { navigate } from '../utils/router.js';
 import { calculateAllSalaries, formatCurrency } from '../utils/salary-calc.js';
-import { formatHoursShort, formatDate, formatTime, getDayName } from '../utils/time.js';
+import { formatHoursShort, formatDate, formatTime, getDayName, getVNDateString, getMonthRange } from '../utils/time.js';
 import { renderNavbar, setupNavbar } from '../components/navbar.js';
 import { toast } from '../components/toast.js';
 import { exportToCSV, exportToFormattedExcel } from '../utils/export.js';
@@ -77,9 +77,8 @@ export default async function salaryPage(container) {
     btnCalculate.innerHTML = '⏳ Đang tính...';
 
     try {
-      // Get date range for selected month
-      const startDate = new Date(year, month - 1, 1).toISOString();
-      const endDate = new Date(year, month, 0, 23, 59, 59, 999).toISOString();
+      // Get date range for selected month (Vietnam timezone UTC+7)
+      const { start: startDate, end: endDate } = getMonthRange(year, month);
 
       const [employees, attendance] = await Promise.all([
         getEmployees(),
@@ -263,7 +262,7 @@ export default async function salaryPage(container) {
     if (item.records) {
       for (const r of item.records) {
         if (r.check_in) {
-          const day = new Date(r.check_in).toISOString().split('T')[0];
+          const day = getVNDateString(r.check_in);
           if (!recordsByDay[day]) recordsByDay[day] = [];
           recordsByDay[day].push(r);
         }
@@ -423,7 +422,7 @@ export default async function salaryPage(container) {
     if (item.records) {
       for (const r of item.records) {
         if (r.check_in) {
-          const day = new Date(r.check_in).toISOString().split('T')[0];
+          const day = getVNDateString(r.check_in);
           if (!recordsByDay[day]) recordsByDay[day] = [];
           recordsByDay[day].push(r);
         }

@@ -22,6 +22,7 @@ import {
   getCurrentMonthRange,
   toInputDate,
   toInputDatetime,
+  getVNDateString,
 } from '../utils/time.js';
 import { toast } from '../components/toast.js';
 import { showModal, closeModal, showConfirm } from '../components/modal.js';
@@ -146,11 +147,11 @@ export default async function attendancePage(container) {
   // ── Load attendance data ──
   async function loadAttendance() {
     const startDate = filterStart.value
-      ? new Date(filterStart.value + 'T00:00:00').toISOString()
-      : new Date(start).toISOString();
+      ? `${filterStart.value}T00:00:00+07:00`
+      : start;
     const endDate = filterEnd.value
-      ? new Date(filterEnd.value + 'T23:59:59').toISOString()
-      : new Date(end).toISOString();
+      ? `${filterEnd.value}T23:59:59.999+07:00`
+      : end;
     const empId = filterEmployee.value || null;
 
     try {
@@ -512,9 +513,10 @@ export default async function attendancePage(container) {
   });
 
   presetYesterday.addEventListener('click', () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const dateStr = toInputDate(yesterday);
+    const todayStr = getVNDateString(new Date());
+    const [y, m, d] = todayStr.split('-').map(Number);
+    const yesterday = new Date(y, m - 1, d - 1);
+    const dateStr = getVNDateString(yesterday);
     filterStart.value = dateStr;
     filterEnd.value = dateStr;
     toast.info('Lọc nhanh: Hôm qua');

@@ -570,9 +570,7 @@ async function showRegistration(container) {
 async function showMonthHistoryModal(employeeId, employeeName) {
   toast.info('Đang tải lịch sử...');
   try {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0).toISOString();
-    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).toISOString();
+    const { start, end } = getCurrentMonthRange();
 
     let records = [];
     try {

@@ -5,7 +5,7 @@
 import { getEmployees, getAttendanceByDate } from '../supabase.js';
 import { getQueryParams, navigate } from '../utils/router.js';
 import { calculateAllSalaries, formatCurrency } from '../utils/salary-calc.js';
-import { formatHoursShort, formatDate, formatTime, getDayName, calculateHours } from '../utils/time.js';
+import { formatHoursShort, formatDate, formatTime, getDayName, calculateHours, getVNDateString, getMonthRange } from '../utils/time.js';
 import { toast } from '../components/toast.js';
 
 export default async function reportPage(container) {
@@ -27,8 +27,7 @@ export default async function reportPage(container) {
   `;
 
   try {
-    const startDate = new Date(selectedYear, selectedMonth - 1, 1).toISOString();
-    const endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59, 999).toISOString();
+    const { start: startDate, end: endDate } = getMonthRange(selectedYear, selectedMonth);
 
     const [employees, attendance] = await Promise.all([
       getEmployees(false), // Fetch all employees
@@ -179,7 +178,7 @@ export default async function reportPage(container) {
               if (item.records) {
                 item.records.forEach((r) => {
                   if (r.check_in) {
-                    const dayKey = new Date(r.check_in).toISOString().split('T')[0];
+                    const dayKey = getVNDateString(r.check_in);
                     if (!recordsByDay[dayKey]) recordsByDay[dayKey] = [];
                     recordsByDay[dayKey].push(r);
                   }

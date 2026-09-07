@@ -2,7 +2,7 @@
 // Export Utility - Tiện ích xuất dữ liệu Excel/CSV
 // ============================================================
 
-import { formatDate, formatTime, getDayName, calculateHours } from './time.js';
+import { formatDate, formatTime, getDayName, calculateHours, getVNDateString } from './time.js';
 
 /**
  * Xuất dữ liệu mảng hai chiều ra file CSV tương thích với Excel (hỗ trợ tiếng Việt UTF-8)
@@ -149,7 +149,7 @@ export function exportToFormattedExcel(filename, month, year, data) {
     if (item.records) {
       item.records.forEach((r) => {
         if (r.check_in) {
-          const dayKey = new Date(r.check_in).toISOString().split('T')[0];
+          const dayKey = getVNDateString(r.check_in);
           if (!recordsByDay[dayKey]) recordsByDay[dayKey] = [];
           recordsByDay[dayKey].push(r);
         }

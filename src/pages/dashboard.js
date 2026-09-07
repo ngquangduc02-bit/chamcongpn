@@ -4,7 +4,7 @@
 
 import { isAdminLoggedIn, getTodayAttendance, getEmployees, getAttendanceByDate } from '../supabase.js';
 import { navigate } from '../utils/router.js';
-import { formatTime, formatHoursShort, calculateHours, getCurrentWeekRange, getDayName } from '../utils/time.js';
+import { formatTime, formatHoursShort, calculateHours, getCurrentWeekRange, getDayName, getVNDateString } from '../utils/time.js';
 import { renderNavbar, setupNavbar } from '../components/navbar.js';
 import { toast } from '../components/toast.js';
 
@@ -210,17 +210,16 @@ export default async function dashboard(container) {
       const { start } = getCurrentWeekRange();
       const monday = new Date(start);
       const dayNames = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
-      const today = new Date();
-      const todayStr = today.toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
+      const todayStr = getVNDateString(new Date());
 
       const weekData = Array.from({ length: 7 }, (_, i) => {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
-        const dateStr = d.toLocaleDateString('en-CA'); // YYYY-MM-DD
+        const dateStr = getVNDateString(d); // YYYY-MM-DD in Vietnam timezone
 
         // Sum hours for this day
         const dayRecords = weekRecords.filter(r => {
-          const rDate = new Date(r.check_in).toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
+          const rDate = getVNDateString(r.check_in);
           return rDate === dateStr;
         });
 

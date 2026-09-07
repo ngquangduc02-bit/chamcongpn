@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { getTodayRange } from './utils/time.js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -206,12 +207,8 @@ export async function getAttendanceByDate(startDate, endDate, employeeId = null)
 }
 
 export async function getTodayAttendance() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  return getAttendanceByDate(today.toISOString(), tomorrow.toISOString());
+  const { start, end } = getTodayRange();
+  return getAttendanceByDate(start, end);
 }
 
 export async function updateAttendance(id, updates) {
