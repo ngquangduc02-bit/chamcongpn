@@ -23,6 +23,8 @@ import {
   toInputDate,
   toInputDatetime,
   getVNDateString,
+  dateStringToISOStart,
+  dateStringToISOEnd,
 } from '../utils/time.js';
 import { toast } from '../components/toast.js';
 import { showModal, closeModal, showConfirm } from '../components/modal.js';
@@ -147,10 +149,10 @@ export default async function attendancePage(container) {
   // ── Load attendance data ──
   async function loadAttendance() {
     const startDate = filterStart.value
-      ? `${filterStart.value}T00:00:00+07:00`
+      ? dateStringToISOStart(filterStart.value)
       : start;
     const endDate = filterEnd.value
-      ? `${filterEnd.value}T23:59:59.999+07:00`
+      ? dateStringToISOEnd(filterEnd.value)
       : end;
     const empId = filterEmployee.value || null;
 

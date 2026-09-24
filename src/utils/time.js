@@ -124,13 +124,37 @@ export function getElapsedTime(checkInTime) {
 }
 
 /**
+ * Chuyển ngày YYYY-MM-DD sang ISO string UTC tương ứng với 00:00:00 giờ Việt Nam (UTC+7).
+ * Sử dụng hậu tố 'Z' để an toàn 100% khi truyền qua query string của Supabase / PostgREST (tránh dấu '+' bị decode thành khoảng trắng).
+ * @param {string} dateStr - VD: "2026-09-24"
+ * @returns {string} ISO UTC string (VD: "2026-09-23T17:00:00.000Z")
+ */
+export function dateStringToISOStart(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d, -7, 0, 0, 0)).toISOString();
+}
+
+/**
+ * Chuyển ngày YYYY-MM-DD sang ISO string UTC tương ứng với 23:59:59.999 giờ Việt Nam (UTC+7).
+ * Sử dụng hậu tố 'Z' để an toàn 100% khi truyền qua query string của Supabase / PostgREST.
+ * @param {string} dateStr - VD: "2026-09-24"
+ * @returns {string} ISO UTC string (VD: "2026-09-24T16:59:59.999Z")
+ */
+export function dateStringToISOEnd(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d, 16, 59, 59, 999)).toISOString();
+}
+
+/**
  * Lấy khoảng thời gian của ngày hôm nay theo múi giờ Việt Nam (UTC+7)
  */
 export function getTodayRange() {
   const vnDateStr = getVNDateString(new Date());
   return {
-    start: `${vnDateStr}T00:00:00+07:00`,
-    end: `${vnDateStr}T23:59:59.999+07:00`,
+    start: dateStringToISOStart(vnDateStr),
+    end: dateStringToISOEnd(vnDateStr),
   };
 }
 
@@ -140,12 +164,14 @@ export function getTodayRange() {
  * @param {number} month (1 - 12)
  */
 export function getMonthRange(year, month) {
-  const m = String(month).padStart(2, '0');
-  const lastDay = new Date(year, month, 0).getDate();
+  const y = Number(year);
+  const m = Number(month);
+  const lastDay = new Date(y, m, 0).getDate();
+  const mStr = String(m).padStart(2, '0');
   const lastDayStr = String(lastDay).padStart(2, '0');
   return {
-    start: `${year}-${m}-01T00:00:00+07:00`,
-    end: `${year}-${m}-${lastDayStr}T23:59:59.999+07:00`,
+    start: dateStringToISOStart(`${y}-${mStr}-01`),
+    end: dateStringToISOEnd(`${y}-${mStr}-${lastDayStr}`),
   };
 }
 
@@ -175,8 +201,8 @@ export function getCurrentWeekRange() {
   const sunStr = `${sunday.getFullYear()}-${String(sunday.getMonth() + 1).padStart(2, '0')}-${String(sunday.getDate()).padStart(2, '0')}`;
 
   return {
-    start: `${monStr}T00:00:00+07:00`,
-    end: `${sunStr}T23:59:59.999+07:00`,
+    start: dateStringToISOStart(monStr),
+    end: dateStringToISOEnd(sunStr),
   };
 }
 

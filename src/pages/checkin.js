@@ -17,7 +17,7 @@ import {
 } from '../supabase.js';
 import { navigate } from '../utils/router.js';
 import { getCurrentPosition, getIPInfo, verifyLocation, verifyIP } from '../utils/location.js';
-import { formatTime, formatHours, formatDate, calculateHours, getTodayRange, getCurrentMonthRange } from '../utils/time.js';
+import { formatTime, formatHours, formatDate, calculateHours, getTodayRange, getCurrentMonthRange, getMonthRange, getVNDateString } from '../utils/time.js';
 import { toast } from '../components/toast.js';
 import { showModal, closeModal } from '../components/modal.js';
 
@@ -421,7 +421,7 @@ export default async function checkinPage(container) {
     const viewHistoryBtn = document.getElementById('view-history-btn');
     if (viewHistoryBtn) {
       viewHistoryBtn.addEventListener('click', () => {
-        showMonthHistoryModal(employeeId, employee.name);
+        showMonthHistoryModal(employee);
       });
     }
 
@@ -567,93 +567,164 @@ async function showRegistration(container) {
 // Show month history modal for employee
 // ============================================================
 
-async function showMonthHistoryModal(employeeId, employeeName) {
-  toast.info('Đang tải lịch sử...');
-  try {
-    const now = new Date();
-    const { start, end } = getCurrentMonthRange();
+async function showMonthHistoryModal(target, nameFallback = '') {
+  const employee = typeof target === 'object' && target !== null ? target : null;
+  const employeeId = employee ? employee.id : target;
+  const employeeName = employee ? employee.name : (nameFallback || 'Nhân viên');
 
-    let records = [];
+  const now = new Date();
+  const vnDateStr = getVNDateString(now);
+  const [currentY, currentM] = vnDateStr.split('-').map(Number);
+
+  let selectedMonth = currentM;
+  let selectedYear = currentY;
+
+  async function fetchAndRenderBody(containerEl, m, y) {
+    containerEl.innerHTML = `
+      <div class="text-center p-4">
+        <div class="loading-spinner">⏳</div>
+        <p class="text-secondary mt-2" style="font-size: 0.85rem;">Đang tải lịch sử Tháng ${m}/${y}...</p>
+      </div>
+    `;
+
     try {
-      records = (await getAttendanceByDate(start, end, employeeId)) || [];
-    } catch (queryErr) {
-      console.warn('Lỗi lấy attendance theo ngày:', queryErr);
-      records = [];
-    }
+      const { start, end } = getMonthRange(y, m);
+      const records = (await getAttendanceByDate(start, end, employeeId)) || [];
 
-    let totalHours = 0;
-    records.forEach(r => {
-      if (r.check_out) {
-        const raw = calculateHours(r.check_in, r.check_out);
-        const deductVal = (r.deducted_minutes || 0) / 60;
-        const shiftHours = Math.max(0, raw - deductVal);
-        totalHours += shiftHours;
+      let totalHours = 0;
+      let totalSessions = 0;
+      const uniqueDays = new Set();
+
+      records.forEach(r => {
+        if (r.check_out) {
+          const raw = calculateHours(r.check_in, r.check_out);
+          const deductVal = (r.deducted_minutes || 0) / 60;
+          const shiftHours = Math.max(0, raw - deductVal);
+          totalHours += shiftHours;
+          totalSessions++;
+          if (r.check_in) {
+            uniqueDays.add(getVNDateString(r.check_in));
+          }
+        }
+      });
+
+      let salaryText = '';
+      if (employee && employee.salary_rate > 0) {
+        let salary = 0;
+        if (employee.salary_type === 'hourly') {
+          salary = totalHours * employee.salary_rate;
+        } else {
+          salary = (employee.salary_rate / 26) * uniqueDays.size;
+        }
+        const formattedSalary = new Intl.NumberFormat('vi-VN').format(Math.round(salary)) + 'đ';
+        salaryText = `<div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">💰 Lương tạm tính: <strong style="color: var(--success);">${formattedSalary}</strong></div>`;
       }
-    });
 
-    const recordsHtml = records.length > 0
-      ? `<div class="table-container" style="max-height: 280px; overflow-y: auto; margin-top: 10px; border-radius: var(--border-radius-lg);">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-            <thead>
-              <tr style="background: rgba(255, 255, 255, 0.02);">
-                <th style="padding: var(--space-2) var(--space-3); text-align: left; font-size: 0.75rem; color: var(--text-tertiary);">Thời gian</th>
-                <th style="padding: var(--space-2) var(--space-3); text-align: right; font-size: 0.75rem; color: var(--text-tertiary);">Số giờ</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${records.map(r => {
-                let shiftHours = 0;
-                if (r.check_out) {
-                  const raw = calculateHours(r.check_in, r.check_out);
-                  const deductVal = (r.deducted_minutes || 0) / 60;
-                  shiftHours = Math.max(0, raw - deductVal);
-                }
-                const hoursText = r.check_out ? `${shiftHours.toFixed(2)}h` : 'Đang làm';
-                const deductionText = r.deducted_minutes > 0 ? `<br><small style="color:var(--danger); font-size: 0.7rem;">(trừ ${r.deducted_minutes}p)</small>` : '';
-                return `
-                  <tr style="border-bottom: 1px solid var(--border-default);">
-                    <td style="padding: var(--space-2) var(--space-3); font-size: 0.8rem; line-height: 1.4;">
-                      <strong>${formatDate(r.check_in)}</strong><br>
-                      <span class="text-secondary">${formatTime(r.check_in)} - ${r.check_out ? formatTime(r.check_out) : '...'}</span>
-                    </td>
-                    <td style="padding: var(--space-2) var(--space-3); text-align: right; font-weight: bold; color: ${r.check_out ? 'var(--text-primary)' : 'var(--success)'}">
-                      ${hoursText}${deductionText}
-                    </td>
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
-         </div>`
-      : '<p class="text-center text-muted p-4" style="font-size: 0.9rem;">Chưa có bản ghi chấm công nào trong tháng này.</p>';
+      const recordsHtml = records.length > 0
+        ? `<div class="table-container" style="max-height: 280px; overflow-y: auto; margin-top: 10px; border-radius: var(--border-radius-lg);">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+              <thead>
+                <tr style="background: rgba(255, 255, 255, 0.02);">
+                  <th style="padding: var(--space-2) var(--space-3); text-align: left; font-size: 0.75rem; color: var(--text-tertiary);">Thời gian</th>
+                  <th style="padding: var(--space-2) var(--space-3); text-align: right; font-size: 0.75rem; color: var(--text-tertiary);">Số giờ</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${records.map(r => {
+                  let shiftHours = 0;
+                  if (r.check_out) {
+                    const raw = calculateHours(r.check_in, r.check_out);
+                    const deductVal = (r.deducted_minutes || 0) / 60;
+                    shiftHours = Math.max(0, raw - deductVal);
+                  }
+                  const hoursText = r.check_out ? `${shiftHours.toFixed(2)}h` : 'Đang làm';
+                  const deductionText = r.deducted_minutes > 0 ? `<br><small style="color:var(--danger); font-size: 0.7rem;">(trừ ${r.deducted_minutes}p)</small>` : '';
+                  return `
+                    <tr style="border-bottom: 1px solid var(--border-default);">
+                      <td style="padding: var(--space-2) var(--space-3); font-size: 0.8rem; line-height: 1.4;">
+                        <strong>${formatDate(r.check_in)}</strong><br>
+                        <span class="text-secondary">${formatTime(r.check_in)} - ${r.check_out ? formatTime(r.check_out) : '...'}</span>
+                      </td>
+                      <td style="padding: var(--space-2) var(--space-3); text-align: right; font-weight: bold; color: ${r.check_out ? 'var(--text-primary)' : 'var(--success)'}">
+                        ${hoursText}${deductionText}
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+           </div>`
+        : `<p class="text-center text-muted p-4" style="font-size: 0.9rem;">Chưa có bản ghi chấm công nào trong tháng ${m}/${y}.</p>`;
 
-    showModal({
-      title: `📅 Lịch sử làm: ${employeeName}`,
-      content: `
-        <div style="margin-bottom: 15px;">
+      containerEl.innerHTML = `
+        <div style="margin-bottom: 12px;">
           <div class="flex flex-between align-center p-3" style="background: rgba(255,255,255,0.03); border-radius: var(--border-radius-lg); border: 1px solid var(--border-default);">
             <div>
-              <div style="font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">Tổng giờ tháng ${now.getMonth() + 1}</div>
+              <div style="font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">Tổng giờ tháng ${m}/${y}</div>
               <div style="font-size: 1.35rem; font-weight: 800; color: var(--accent-start); margin-top: 2px;">${totalHours.toFixed(2)}h</div>
+              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">${totalSessions} ca (${uniqueDays.size} ngày đi làm)</div>
+              ${salaryText}
             </div>
             <div style="font-size: 1.8rem; opacity: 0.8;">⏱️</div>
           </div>
         </div>
         ${recordsHtml}
-      `,
-      size: 'medium',
-      actions: [
-        {
-          label: 'Đóng',
-          className: 'btn-primary',
-          onClick: () => closeModal()
-        }
-      ]
-    });
-  } catch (err) {
-    console.error('Lỗi tải lịch sử nhân viên:', err);
-    toast.error('Không thể tải lịch sử chấm công.');
+      `;
+    } catch (err) {
+      console.error('Lỗi lấy lịch sử chấm công:', err);
+      containerEl.innerHTML = `<div class="p-3 text-center text-danger" style="font-size: 0.85rem;">❌ Không thể tải lịch sử: ${err.message || 'Lỗi kết nối'}. Vui lòng thử lại.</div>`;
+    }
   }
+
+  const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1)
+    .map(m => `<option value="${m}" ${m === selectedMonth ? 'selected' : ''}>Tháng ${m}</option>`)
+    .join('');
+
+  const yearOptions = [currentY - 1, currentY, currentY + 1]
+    .map(y => `<option value="${y}" ${y === selectedYear ? 'selected' : ''}>Năm ${y}</option>`)
+    .join('');
+
+  const modalEl = showModal({
+    title: `📅 Lịch sử làm: ${employeeName}`,
+    content: `
+      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <select id="modal-select-month" class="form-input form-select" style="padding: 6px 10px; font-size: 0.85rem; flex: 1;">
+          ${monthOptions}
+        </select>
+        <select id="modal-select-year" class="form-input form-select" style="padding: 6px 10px; font-size: 0.85rem; width: 105px;">
+          ${yearOptions}
+        </select>
+      </div>
+      <div id="modal-history-content"></div>
+    `,
+    size: 'medium',
+    actions: [
+      {
+        label: 'Đóng',
+        className: 'btn-primary',
+        onClick: () => closeModal()
+      }
+    ]
+  });
+
+  const contentContainer = modalEl.querySelector('#modal-history-content');
+  const monthSelect = modalEl.querySelector('#modal-select-month');
+  const yearSelect = modalEl.querySelector('#modal-select-year');
+
+  if (contentContainer) {
+    fetchAndRenderBody(contentContainer, selectedMonth, selectedYear);
+  }
+
+  const onMonthYearChange = () => {
+    selectedMonth = Number(monthSelect.value);
+    selectedYear = Number(yearSelect.value);
+    if (contentContainer) {
+      fetchAndRenderBody(contentContainer, selectedMonth, selectedYear);
+    }
+  };
+
+  monthSelect?.addEventListener('change', onMonthYearChange);
+  yearSelect?.addEventListener('change', onMonthYearChange);
 }
 
 // ============================================================
